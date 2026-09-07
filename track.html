@@ -17,6 +17,7 @@ renderChrome('track.html');
 $('#main').innerHTML = `
   <h1>Progress</h1>
   <p class="lede">Once a week, same morning, same conditions. Waist at the navel is the number that answers the belly-fat question, and it often moves when the scale will not. Everything here is saved only in this browser and is never sent anywhere.</p>
+  <div id="prof"></div>
 
   <div class="card">
     <div class="inputrow">
@@ -37,6 +38,12 @@ $('#main').innerHTML = `
     <table class="log"><thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Waist</th><th>Change</th><th></th></tr></thead>
     <tbody id="rows"></tbody></table>
     <p class="muted" id="empty" hidden style="margin-top:.6rem">Nothing logged yet. Weigh in Saturday morning and start the baseline.</p>
+  </div>
+
+  <h2>${esc(FUEL.waist.title)}</h2>
+  <div class="card">
+    <p style="margin-top:0">${esc(FUEL.waist.body)}</p>
+    ${FUEL.waist.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
   </div>
 
   <h2>Bloodwork</h2>
@@ -63,15 +70,20 @@ function delta(cur, prev, u) {
   return `<span style="color:${col}">${d > 0 ? '+' : ''}${d}${u || ''}</span>`;
 }
 
-function sparkline(pts, color) {
+function sparkline(pts, color, target) {
   if (pts.length < 2) return '';
   const w = 320, h = 60, pad = 4;
   const xs = pts.map((p, i) => pad + i * (w - 2 * pad) / (pts.length - 1));
-  const min = Math.min(...pts.map(p => p.v)), max = Math.max(...pts.map(p => p.v));
+  const vals = pts.map(p => p.v).concat(target != null ? [target] : []);
+  const min = Math.min(...vals), max = Math.max(...vals);
   const span = (max - min) || 1;
-  const ys = pts.map(p => h - pad - ((p.v - min) / span) * (h - 2 * pad));
+  const y = (v) => h - pad - ((v - min) / span) * (h - 2 * pad);
+  const ys = pts.map(p => y(p.v));
   const d = xs.map((x, i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + ys[i].toFixed(1)).join(' ');
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
+    ${target != null ? `<line x1="${pad}" y1="${y(target).toFixed(1)}" x2="${w - pad}" y2="${y(target).toFixed(1)}"
+      stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="${w - pad}" y="${(y(target) - 4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--ink-3)">target ${target}</text>` : ''}
     <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     ${xs.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2.5" fill="${color}"/>`).join('')}
   </svg>`;
@@ -91,22 +103,36 @@ function draw() {
     </tr>`;
   }).reverse().join('');
 
+  const prof = store.get('fuel', {});
+  const waistTarget = prof.ht ? +(prof.ht / 2).toFixed(1) : null;
+  const goal = prof.gw || null;
+
+  $('#prof').innerHTML = waistTarget
+    ? `<div class="card"><div class="flag reset" style="margin:0"><b>Your targets:</b>
+        waist under <b>${waistTarget}"</b>, which is half your height and the 0.5 waist-to-height line${goal ? `, and <b>${goal} lb</b> on the scale` : ''}.
+        Waist is the one to trust. Set on the <a href="fuel.html">Fuel page</a>.</div></div>`
+    : `<div class="card"><p class="muted" style="margin:0">Put your height in on the <a href="fuel.html">Fuel page</a> and this page will show your waist target next to what you measured. Nothing leaves the browser.</p></div>`;
+
   const wts = log.filter(e => e.wt != null).map(e => ({ v: +e.wt }));
   const wss = log.filter(e => e.ws != null).map(e => ({ v: +e.ws }));
   const first = wts[0], last = wts[wts.length - 1];
   const fw = wss[0], lw = wss[wss.length - 1];
+  const toWaist = waistTarget && lw ? +(lw.v - waistTarget).toFixed(1) : null;
+  const toGoal = goal && last ? +(last.v - goal).toFixed(1) : null;
   $('#stats').innerHTML = `
     <div><b>${last ? last.v : '-'}</b><span>Weight now</span></div>
     <div><b>${first && last ? (last.v - first.v > 0 ? '+' : '') + (+(last.v - first.v).toFixed(1)) : '-'}</b><span>Since start</span></div>
     <div><b>${lw ? lw.v + '"' : '-'}</b><span>Waist now</span></div>
-    <div><b>${fw && lw ? (lw.v - fw.v > 0 ? '+' : '') + (+(lw.v - fw.v).toFixed(2)) + '"' : '-'}</b><span>Waist change</span></div>`;
+    <div><b>${fw && lw ? (lw.v - fw.v > 0 ? '+' : '') + (+(lw.v - fw.v).toFixed(2)) + '"' : '-'}</b><span>Waist change</span></div>
+    ${toWaist != null ? `<div><b>${toWaist > 0 ? toWaist + '"' : 'there'}</b><span>To waist target</span></div>` : ''}
+    ${toGoal != null ? `<div><b>${toGoal > 0 ? toGoal + ' lb' : 'there'}</b><span>To goal weight</span></div>` : ''}`;
 
   const c = $('#chart');
   if (wts.length > 1 || wss.length > 1) {
     $('#chartcard').hidden = false;
     c.innerHTML =
-      (wts.length > 1 ? `<p class="muted" style="margin:.2rem 0">Weight</p>` + sparkline(wts, 'var(--accent)') : '') +
-      (wss.length > 1 ? `<p class="muted" style="margin:.6rem 0 .2rem">Waist</p>` + sparkline(wss, 'var(--green)') : '');
+      (wts.length > 1 ? `<p class="muted" style="margin:.2rem 0">Weight</p>` + sparkline(wts, 'var(--accent)', goal) : '') +
+      (wss.length > 1 ? `<p class="muted" style="margin:.6rem 0 .2rem">Waist</p>` + sparkline(wss, 'var(--green)', waistTarget) : '');
   } else {
     $('#chartcard').hidden = true;
   }

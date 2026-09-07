@@ -24,6 +24,9 @@ const CONFIG = {
   snackTime: '3:30 pm',
   // Protein target, grams/day. Roughly 1g per lb of goal bodyweight.
   proteinTarget: 170,
+  // Used to prefill the Fuel calculator. Height and weight are never stored here,
+  // only in your own browser, because this repo is public.
+  age: 40,
   liftDays: ['Mon', 'Tue', 'Thu', 'Fri'],
   // One free meal a week, on the calendar, on purpose.
   freeMealDay: 'Sat',
@@ -1258,6 +1261,15 @@ const FUEL = {
       { when: 'Total', what: 'Three occasions, no snacking between them', protein: '145 to 170g', kcal: '1,600 to 2,000' },
     ],
     note: 'The portion sizes matter more than the food choices here. Six ounces of cooked meat is about 45g of protein and it looks like a smallish piece on a big plate, which is how a day that felt like plenty comes in at 120g. Weigh your dinner protein twice, once this week and once in a month, and you will not need to weigh it again.',
+  },
+  waist: {
+    title: 'The number that answers the belly question',
+    body: 'Weight is a poor instrument for what you are actually asking about, and BMI is worse for someone who lifts, because it cannot tell muscle from fat. Waist measured at the navel, divided by your height, is the simple screen for exactly the fat you are trying to lose. Under 0.5 is the line, which means your waist should come in under half your height in inches.',
+    points: [
+      { p: 'Measure it the same way every time.', d: 'First thing Saturday morning, before eating, standing relaxed rather than sucking in, tape at the navel and level all the way round. Same conditions is what makes the number comparable week to week, and comparability is the entire value of it.' },
+      { p: 'Expect it to move before the scale does.', d: 'Visceral fat around the middle is the most metabolically responsive kind and it goes early on this way of eating. A month where the scale drops two pounds and the waist drops an inch is a much better month than the reverse, and it usually means you kept the muscle.' },
+      { p: 'It is the one that maps to the labs.', d: 'Waist and waist-to-height track insulin resistance more closely than total weight does, which is why this is the number worth caring about given a prediabetes history. If it is coming down, the thing you actually care about is improving.' },
+    ],
   },
   snacks: [
     { what: 'Cottage cheese, 1 cup, low fat', protein: '26g', kcal: '180', note: 'The best protein per calorie on the list. Gochugaru and cucumber in Korean week, salsa and lime in Mexican, zhoug in Middle Eastern. It takes the week sauce like everything else does.' },

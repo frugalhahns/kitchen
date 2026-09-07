@@ -32,7 +32,7 @@ $('#main').innerHTML = `
       <label>Weight now (lb)<input type="number" step="1" id="wt" inputmode="decimal"></label>
       <label>Goal weight (lb)<input type="number" step="1" id="gw" inputmode="decimal"></label>
       <label>Height (in)<input type="number" step="0.5" id="ht" inputmode="decimal"></label>
-      <label>Age<input type="number" step="1" id="ag" inputmode="numeric"></label>
+      <label>Age<input type="number" step="1" id="ag" inputmode="numeric" value="${CONFIG.age || ''}"></label>
       <label>Activity<select id="ac">
         <option value="1.35">Desk job, not much walking</option>
         <option value="1.5" selected>Desk job, 4 lifts and 8 to 10k steps</option>
@@ -41,6 +41,13 @@ $('#main').innerHTML = `
       <button id="save">Work it out</button>
     </div>
     <div id="out"></div>
+  </div>
+
+  <h2>${esc(FUEL.waist.title)}</h2>
+  <p class="muted">${esc(FUEL.waist.body)}</p>
+  <div class="card">
+    ${FUEL.waist.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+    <p class="muted" style="margin-top:.8rem">Enter your height above and the number appears in the results, and on the <a href="track.html">Progress page</a> next to what you actually measured.</p>
   </div>
 
   <h2>${esc(FUEL.day.title)}</h2>
@@ -116,6 +123,7 @@ function calc() {
   const proKcal = pro * 4, fatKcal = fatMin * 9;
   const restKcal = target - proKcal - fatKcal;
 
+  const waistTarget = +(ht / 2).toFixed(1);
   const perWeek = (tdee - target) * 7 / 3500;
   const pctWeek = perWeek / wt * 100;
   const toGoal = gw && gw < wt ? Math.ceil((wt - gw) / perWeek) : null;
@@ -148,7 +156,7 @@ function calc() {
       <div><b>${target.toLocaleString()}</b><span>Calories a day</span></div>
       <div><b>${pro}g</b><span>Protein a day</span></div>
       <div><b>${perWeek.toFixed(1)} lb</b><span>Fat loss a week</span></div>
-      <div><b>${tdee.toLocaleString()}</b><span>What you burn</span></div>
+      <div><b>${waistTarget}"</b><span>Waist target</span></div>
     </div>
     <div class="flag reset" style="margin-top:.9rem">
       <b>Your plan:</b> eat about <b>${target.toLocaleString()} calories</b> and <b>${pro}g of protein</b> a day, across three occasions.
@@ -159,6 +167,7 @@ function calc() {
       <thead><tr><th>Number</th><th>Value</th><th>Where it comes from</th></tr></thead>
       <tbody>
         <tr><td><b>Resting rate</b></td><td>${bmr.toLocaleString()}</td><td class="nw">Mifflin-St Jeor, what you would burn asleep all day.</td></tr>
+        <tr><td><b>Waist target</b></td><td>under ${waistTarget}"</td><td class="nw">Half your height, the 0.5 waist-to-height line. A better measure of the fat you are trying to lose than either the scale or BMI.</td></tr>
         <tr><td><b>Daily burn</b></td><td>${tdee.toLocaleString()}</td><td class="nw">Resting rate times ${ac}, for four lifts a week plus the walking.</td></tr>
         <tr><td><b>Eat</b></td><td>${target.toLocaleString()}</td><td class="nw">A ${(tdee - target).toLocaleString()} deficit, ${Math.round((tdee - target) / tdee * 100)} percent below burn and no more than 1 percent of bodyweight a week. Modest on purpose, so the lifting still builds something.</td></tr>
         <tr><td><b>Protein</b></td><td>${proLo} to ${pro}g</td><td class="nw">About 1g per lb of ${gw && gw < wt ? 'goal' : 'estimated lean'} bodyweight, which is ${basis} lb. Non-negotiable, and the number this plan was failing to hit.</td></tr>
