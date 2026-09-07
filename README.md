@@ -67,6 +67,18 @@ they got swept out by low-carb habit. Lentil and chicken soup is now the highest
 recipe on the site: 30g of protein and 12g of fiber a bowl, and it freezes for four
 months.
 
+## Soups and stews are the backbone
+
+Not just one recipe. A pot is the most filling food per calorie there is, the only easy
+way to eat two pounds of greens and a cup of lentils, and the thing that lets meat be the
+flavoring rather than the foundation. It is also the best freezer food by a distance:
+four months, thaws flat in twenty minutes, reheats indistinguishable. `soup-formula` is
+the template rather than a recipe (protein plus legume plus aromatics plus greens plus
+acid, four spice variants), and `bone-broth` turns the banked carcasses into the base for
+all of it. The two honest caveats are on the Fuel page: a bowl is often 25 to 30g of
+protein rather than 50, so pair it, and potato, dairy, rice and noodles do not survive
+the freezer, so add those to the bowl instead of the pot.
+
 ## The protein mix
 
 Every week is built to two fish nights, two chicken nights and two red meat nights, with

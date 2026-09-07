@@ -58,6 +58,16 @@ $('#main').innerHTML = `
     <p class="muted" style="margin:.8rem 0 0">A day that hits it: three cups of roasted vegetables, half an avocado, kimchi, and one cup of lentils or beans. That is 34g without trying, and the lentil soup does most of it in one bowl.</p>
   </div>
 
+  <h2>${esc(FUEL.soup.title)}</h2>
+  <p class="muted">${esc(FUEL.soup.body)}</p>
+  <div class="card">
+    ${FUEL.soup.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Where it goes wrong</h3>
+    ${FUEL.soup.caveats.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+
   <h2>${esc(FUEL.waist.title)}</h2>
   <p class="muted">${esc(FUEL.waist.body)}</p>
   <div class="card">
