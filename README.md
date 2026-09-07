@@ -56,6 +56,10 @@ That is a fat-loss plan, not the recomposition it claimed. The fix is a protein 
 fasting hours are doing real work on fasting glucose. Each week has its own version built
 around whichever sauce jar is already open, and the Fuel page carries the arithmetic.
 
+The window itself is switchable on the week view, between noon to 8pm and 10am to 6pm.
+All three meal times shift with it and every page follows, so a morning lift does not
+mean eating outside the window.
+
 ## Fiber, and the legumes that were missing
 
 The first version of this plan did not mention fiber once, and told you to skip the beans
@@ -109,7 +113,8 @@ Common edits:
 | Change what is in the fridge and by when | the `keeps` array on the week |
 | Change what gets banked | the `freezer` array on the week, `{ what, months }` |
 | Change lift days | `CONFIG.liftDays` |
-| Move the afternoon meal | `CONFIG.snackTime`, and `snack` on each week |
+| Change the eating windows | `CONFIG.windows`; the picker on the week view switches between them |
+| Change the afternoon meal | `snack` on each week |
 | Change the protein target | `CONFIG.proteinTarget`, which the Fuel page checks against |
 | Move the free meal | `CONFIG.freeMealDay`, and the `free: true` day in `WEEKS` |
 

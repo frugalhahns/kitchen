@@ -18,10 +18,20 @@ const CONFIG = {
   resetWeeks: 12,
   // Set your real date. The week containing it gets a note.
   birthday: '2026-10-15',
-  // Eating window (16:8). Hold it loosely, see the Plan page.
-  window: { start: '12:00 pm', end: '8:00 pm' },
-  // Third eating occasion, inside the window. See the Fuel page for why.
-  snackTime: '3:30 pm',
+  // Eating windows (16:8 either way). Pick one on the week view, it sticks.
+  // Three eating occasions inside whichever you choose. See the Fuel page for why.
+  windows: [
+    {
+      id: 'noon', label: 'Noon to 8pm',
+      first: '12:00 pm', snack: '3:30 pm', dinner: '7:00 pm', end: '8:00 pm',
+      why: 'The default. Right if you lift in the afternoon or evening and eat dinner with the family at seven.',
+    },
+    {
+      id: 'early', label: '10am to 6pm',
+      first: '10:00 am', snack: '2:00 pm', dinner: '5:30 pm', end: '6:00 pm',
+      why: 'Shift here if you lift in the morning, or if you want the last meal well clear of bedtime. Eating earlier in the day tends to sit better with fasting glucose, and it is the same 16:8 either way. The first meal becomes eggs and vegetables rather than a full plate.',
+    },
+  ],
   // Protein target, grams/day. Roughly 1g per lb of goal bodyweight.
   proteinTarget: 170,
   // Fiber target, grams/day. The number this plan was missing entirely.
@@ -1224,7 +1234,7 @@ const PROTOCOL = {
     { rule: 'Fiber, 30 to 40g a day. Lentils and beans are how you get there.', detail: 'This plan originally had no fiber target at all, which was a real hole given both of your numbers. Vegetables alone get you to about 17g. A cup of lentils or black beans adds 15 and closes it in one move. Viscous fiber lowers LDL directly and blunts the glucose rise from anything eaten with it, so it happens to be the one addition that works on your cholesterol and your blood sugar at the same time. Legumes are not grains and were never excluded from this protocol.' },
     { rule: 'Ten pounds of vegetables a week, from the market.', detail: 'It sounds like a lot and it is roughly right for two adults. Buy for the slot rather than the recipe: roasting vegetables, sturdy greens, something raw and crunchy, herbs, alliums. Then roast a sheet pan of whatever it was.' },
     { rule: 'Three eating occasions inside the window, not two.', detail: 'Noon, around 3:30pm, and dinner. Two meals a day quietly delivers about 120g of protein against a 170g target and a deficit big enough to cost you muscle, which is a fat-loss plan rather than the recomposition you actually want. The afternoon one is a protein meal, not a snack: cottage cheese, yogurt, or four ounces of whatever is already cooked. The Fuel page has the arithmetic and your numbers.' },
-    { rule: 'Eat between noon and 8pm, and hold it loosely.', detail: 'Black coffee, tea and water in the morning. The window is a tool for eating less without counting, not a rule with moral weight. If you lift in the morning, shift the whole window earlier rather than eating outside it. Do not solve the protein problem with breakfast, solve it at 3:30pm.' },
+    { rule: 'Pick an eight hour window and hold it loosely.', detail: 'Noon to 8pm or 10am to 6pm, whichever fits the week. Switch it on the week view and every page follows. Black coffee, tea and water outside it. The window is a tool for eating less without counting, not a rule with moral weight, and the earlier one tends to sit slightly better with fasting glucose if dinner at 5:30 works with your family. What matters is that the three occasions land inside whichever you pick, rather than a fourth appearing outside it.' },
     { rule: 'Fats from animals, olives and avocados.', detail: 'Butter, ghee, tallow, the fat off the chicken pan, olive oil, avocado oil, sesame oil. Save every rendered fat, it is the best thing you will cook with all week and it is free.' },
     { rule: 'Alcohol goes with the free meal, if at all.', detail: 'It stalls fat loss out of proportion to its calories and it reliably wrecks the decisions that keep the rest of this intact. Attaching it to the one free meal means you never have to decide about it on a Tuesday.' },
     { rule: 'Walk ten to fifteen minutes after dinner. Every night.', detail: 'This is the highest-return habit on the whole site and it is not exercise, it is glucose management. Walking right after a meal pulls glucose into muscle without insulin. With a prediabetes history it does more per minute than anything else here. Take your son.' },
@@ -1371,12 +1381,12 @@ const FUEL = {
   },
   day: {
     title: 'How the day should actually add up',
-    body: 'Three eating occasions inside the same noon to 8pm window. Not breakfast, which would cost you the fasting hours that are doing real work on your glucose. The afternoon meal goes in the middle, and on lift days it lands close to training.',
+    body: 'Three eating occasions inside whichever eight hour window you picked. The times below follow it. The afternoon one is the meal that was missing, and on lift days it lands close to training.',
     rows: [
-      { when: 'Noon', what: 'A bowl of the lentil soup, or the sardine plate with half an avocado', protein: '55 to 65g', kcal: '700 to 800', fiber: '12 to 15g' },
-      { when: '3:30 pm', what: 'The protein meal. Cottage cheese or yogurt, with a spoon of chia in it.', protein: '25 to 35g', kcal: '200 to 300', fiber: '5g' },
-      { when: '7 pm', what: 'Dinner: 8 oz of cooked protein, two or three cups of vegetables, fat', protein: '55 to 70g', kcal: '700 to 900', fiber: '10 to 14g' },
-      { when: 'Total', what: 'Three occasions, no snacking between them', protein: '145 to 170g', kcal: '1,600 to 2,000', fiber: '30 to 35g' },
+      { slot: 'first', what: 'First meal: a bowl of soup, or the sardine plate with half an avocado', protein: '55 to 65g', kcal: '700 to 800', fiber: '12 to 15g' },
+      { slot: 'snack', what: 'The protein meal. Cottage cheese or yogurt, with a spoon of chia in it.', protein: '25 to 35g', kcal: '200 to 300', fiber: '5g' },
+      { slot: 'dinner', what: 'Dinner: 8 oz of cooked protein, two or three cups of vegetables, fat', protein: '55 to 70g', kcal: '700 to 900', fiber: '10 to 14g' },
+      { slot: 'total', what: 'Three occasions, no snacking between them', protein: '145 to 170g', kcal: '1,600 to 2,000', fiber: '30 to 35g' },
     ],
     note: 'The portion sizes matter more than the food choices here. Six ounces of cooked meat is about 45g of protein and it looks like a smallish piece on a big plate, which is how a day that felt like plenty comes in at 120g. Weigh your dinner protein twice, once this week and once in a month, and you will not need to weigh it again.',
   },

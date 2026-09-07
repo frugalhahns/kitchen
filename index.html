@@ -15,6 +15,7 @@
 <script>
 renderChrome('index.html');
 const w = weekData();
+const win = activeWindow();
 const st = resetState();
 const mon = mondayForCycleWeek(w.n);
 const cookDay = addDays(mon, -1);
@@ -37,6 +38,7 @@ $('#main').innerHTML = `
   ${w.protein ? `<p class="muted"><b>Protein this week:</b> ${esc(w.protein)}</p>` : ''}
   ${st.started && !st.done ? `<div class="bar"><i style="width:${pct}%"></i></div><p class="muted">Week ${st.resetWeek} of ${CONFIG.resetWeeks} in the reset. Cycle week ${st.cycleWeek} of ${WEEKS.length}.</p>` : ''}
   <div id="wb"></div>
+  <div id="win"></div>
   ${banner}
   <div class="tools">
     <a class="btn" href="cook.html">Sunday cook plan (${esc(w.cookTime)})</a>
@@ -59,6 +61,7 @@ $('#main').innerHTML = `
 `;
 
 weekBar('#wb');
+windowPicker('#win');
 
 $('#keeps').innerHTML = (w.keeps || []).map(k => {
   const by = addDays(cookDay, k.days);
@@ -91,9 +94,9 @@ $('#days').innerHTML = w.days.map((d, i) => {
       ${d.free ? '<span class="pill free">Free meal</span>' : ''}
       <span class="pill ${d.lift ? 'lift' : 'rest'}">${d.lift ? 'Tonal' : 'No lift'}</span>
     </div>
-    <div class="meal"><span class="when">${CONFIG.window.start}</span><span class="what">${esc(d.m1)}${m1r}</span></div>
-    ${d.lift && w.snack ? `<div class="meal"><span class="when">${CONFIG.snackTime}</span><span class="what">${esc(w.snack)} <a href="fuel.html">why</a></span></div>` : ''}
-    <div class="meal"><span class="when">Dinner</span><span class="what">${esc(d.m2)}${m2r}</span></div>
+    <div class="meal"><span class="when">${esc(win.first)}</span><span class="what">${esc(d.m1)}${m1r}</span></div>
+    ${w.snack ? `<div class="meal"><span class="when">${esc(win.snack)}</span><span class="what">${esc(w.snack)} <a href="fuel.html">why</a></span></div>` : ''}
+    <div class="meal"><span class="when">${esc(win.dinner)}</span><span class="what">${esc(d.m2)}${m2r}</span></div>
     ${also.length ? `<div class="alsoline">Also: ${also.map(id => `<a href="recipes.html#${id}">${esc(RECIPES[id].name)}</a>`).join(', ')}</div>` : ''}
     ${d.post ? `<div class="postnote">${esc(d.post)}</div>` : ''}
     ${d.kid ? `<div class="kidline"><b>Son:</b> ${esc(d.kid)}</div>` : ''}

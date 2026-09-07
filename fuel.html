@@ -15,6 +15,8 @@
 <script>
 renderChrome('fuel.html');
 const w = weekData();
+const win = activeWindow();
+const SLOT = { first: win.first, snack: win.snack, dinner: win.dinner, total: 'Total' };
 
 $('#main').innerHTML = `
   <h1>Fuel</h1>
@@ -77,11 +79,12 @@ $('#main').innerHTML = `
 
   <h2>${esc(FUEL.day.title)}</h2>
   <p class="muted">${esc(FUEL.day.body)}</p>
+  <div id="win"></div>
   <div class="card">
     <table class="log">
       <thead><tr><th>When</th><th>Protein</th><th>Fiber</th><th>Calories</th><th>What</th></tr></thead>
       <tbody>${FUEL.day.rows.map((r, i) => `<tr${i === FUEL.day.rows.length - 1 ? ' class="tot"' : ''}>
-        <td><b>${esc(r.when)}</b></td><td>${esc(r.protein)}</td><td>${esc(r.fiber)}</td><td>${esc(r.kcal)}</td><td class="nw">${esc(r.what)}</td>
+        <td><b>${esc(SLOT[r.slot] || r.slot)}</b></td><td>${esc(r.protein)}</td><td>${esc(r.fiber)}</td><td>${esc(r.kcal)}</td><td class="nw">${esc(r.what)}</td>
       </tr>`).join('')}</tbody>
     </table>
     <p class="muted" style="margin:.8rem 0 0">${esc(FUEL.day.note)}</p>
@@ -89,7 +92,7 @@ $('#main').innerHTML = `
 
   <h2>The afternoon meal</h2>
   <div class="card">
-    <div class="flag reset"><b>Week ${w.n}, ${esc(w.cuisine)}:</b> ${esc(w.snack)}</div>
+    <div class="flag reset"><b>${esc(win.snack)}, week ${w.n} ${esc(w.cuisine)}:</b> ${esc(w.snack)}</div>
     <p class="muted" style="margin:.6rem 0 0">Each week has its own version on the <a href="index.html">week view</a>, built around whichever sauce jar is already open. Below is the full list, best protein per calorie first.</p>
   </div>
   <div class="card">
@@ -112,6 +115,8 @@ $('#main').innerHTML = `
     ${FUEL.adjust.map(a => `<div class="qa"><b>${esc(a.signal)}</b><p>${esc(a.do)}</p></div>`).join('')}
   </div>
 `;
+
+windowPicker('#win');
 
 /* ---------- the calculator ---------- */
 
