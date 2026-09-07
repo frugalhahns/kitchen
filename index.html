@@ -34,6 +34,7 @@ if (!st.started) {
 $('#main').innerHTML = `
   <h1>Week ${w.n}: ${esc(w.title)} <span class="cuis">${esc(w.cuisine)}</span></h1>
   <p class="lede">${esc(w.theme)}</p>
+  ${w.protein ? `<p class="muted"><b>Protein this week:</b> ${esc(w.protein)}</p>` : ''}
   ${st.started && !st.done ? `<div class="bar"><i style="width:${pct}%"></i></div><p class="muted">Week ${st.resetWeek} of ${CONFIG.resetWeeks} in the reset. Cycle week ${st.cycleWeek} of ${WEEKS.length}.</p>` : ''}
   <div id="wb"></div>
   ${banner}

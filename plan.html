@@ -26,6 +26,12 @@ $('#main').innerHTML = `
     ${PROTOCOL.rules.map(r => `<li><b>${esc(r.rule)}</b><p>${esc(r.detail)}</p></li>`).join('')}
   </ol></div>
 
+  <h2>${esc(PROTOCOL.protein.title)}</h2>
+  <p class="muted">${esc(PROTOCOL.protein.body)}</p>
+  <div class="card">
+    ${PROTOCOL.protein.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+
   <h2>${esc(PROTOCOL.labs.title)}</h2>
   <div class="card"><p style="margin:0">${esc(PROTOCOL.labs.body)}</p></div>
 
@@ -47,7 +53,7 @@ $('#main').innerHTML = `
 
   <h2>How the four-week cycle is built</h2>
   <div class="card">
-    ${WEEKS.map(w => `<div class="qa"><b>Week ${w.n}: ${esc(w.title)} <span class="cuis">${esc(w.cuisine)}</span> <span class="muted" style="font-weight:400">${esc(w.cookTime)} cook day</span></b><p>${esc(w.theme)}</p></div>`).join('')}
+    ${WEEKS.map(w => `<div class="qa"><b>Week ${w.n}: ${esc(w.title)} <span class="cuis">${esc(w.cuisine)}</span> <span class="muted" style="font-weight:400">${esc(w.cookTime)} cook day</span></b><p>${esc(w.theme)}</p>${w.protein ? `<p class="muted" style="margin-top:.3rem">${esc(w.protein)}</p>` : ''}</div>`).join('')}
     <p class="muted" style="margin-top:.8rem">One cuisine a week is what keeps it simple: one shop, one set of condiments, one spice blend on the sheet-pan chicken. Each cuisine comes around three times across the twelve weeks, and Week 4 being easy is the design rather than a gap.</p>
   </div>
 `;

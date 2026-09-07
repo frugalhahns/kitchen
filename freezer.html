@@ -47,6 +47,15 @@ $('#main').innerHTML = `
     <div class="stat" id="stats"></div>
   </div>
 
+  <h2>What a full bank looks like</h2>
+  <p class="muted">${esc(BANK.intro)}</p>
+  <div class="card">
+    ${BANK.target.map(t => `<div class="qa"><b>${esc(t.what)} <span class="cuis">${esc(t.n)}</span></b><p>${esc(t.why)}</p></div>`).join('')}
+  </div>
+  <div class="card">
+    <ul style="margin:0;padding-left:1.2rem">${BANK.rules.map(r => `<li style="margin:.4rem 0">${esc(r)}</li>`).join('')}</ul>
+  </div>
+
   <h2>How long things keep</h2>
   <p class="muted">${esc(KEEPS.intro)}</p>
   <div class="card">

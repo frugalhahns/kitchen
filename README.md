@@ -24,8 +24,8 @@ light Spanish and American week that mostly comes out of the freezer.
 - **The Plan** - the rules, why each one is there, and what to do when it stalls
 - **Eating Out** - how to take the free meal, then how to order at seven kinds of
   restaurant, and the fifteen-minute meals to read before opening a delivery app
-- **Storage** - a dated freezer inventory that flags what is past its window, plus the
-  full fridge and freezer shelf-life table and the thawing rules
+- **Storage** - a dated freezer inventory that flags what is past its window, what a
+  full bank looks like, plus the shelf-life table and the thawing rules
 - **Progress** - weight, waist and lab dates
 
 ## The three ideas worth stealing
@@ -44,6 +44,16 @@ variety comes from and it costs nothing in effort.
 pizza included. The earlier version of this plan had no exception in it and that is
 exactly why it did not survive. A plan run at seventy percent for a year beats one run
 perfectly for five weeks.
+
+## The protein mix
+
+Every week is built to two fish nights, two chicken nights and two red meat nights, with
+sardines at lunch as the second fish. That shape exists because of a high-cholesterol
+history: protein source barely touches blood sugar, but saturated fat is the main dietary
+lever on ApoB and individual response to it varies a lot. So the fattiest cuts are
+anchors rather than staples, the big soup has a chicken version, and the plan says
+explicitly what to change if the week 12 ApoB comes back up. See "The protein mix, with
+your labs in mind" on the Plan page.
 
 ## Editing it
 
