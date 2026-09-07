@@ -104,8 +104,9 @@ $('#main').innerHTML = `
 
   <h2>The afternoon meal</h2>
   <div class="card">
-    <div class="flag reset"><b>${esc(win.snack)}, week ${w.n} ${esc(w.cuisine)}:</b> ${esc(w.snack)}</div>
-    <p class="muted" style="margin:.6rem 0 0">Each week has its own version on the <a href="index.html">week view</a>, built around whichever sauce jar is already open. Below is the full list, ordered so the no-lactose options come first.</p>
+    <p class="muted" style="margin:0 0 .6rem"><b>Week ${w.n}, ${esc(w.cuisine)}, at ${esc(win.snack)} each day.</b> A different one every day, and never the same protein as that day's lunch or dinner.</p>
+    <div id="wsnacks"></div>
+    <p class="muted" style="margin:.7rem 0 0">Below is the full list to pick from, ordered so the no-lactose options come first.</p>
   </div>
   <div class="card">
     <table class="log">
@@ -129,6 +130,11 @@ $('#main').innerHTML = `
 `;
 
 windowPicker('#win');
+
+$('#wsnacks').innerHTML = w.days.map(d => `<div class="frz">
+  <span class="n">${esc(d.snack || w.snack || '')}</span>
+  <span class="age">${esc(d.day)}</span>
+</div>`).join('');
 
 /* ---------- the calculator ---------- */
 

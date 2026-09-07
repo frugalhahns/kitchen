@@ -83,6 +83,19 @@ all of it. The two honest caveats are on the Fuel page: a bowl is often 25 to 30
 protein rather than 50, so pair it, and potato, dairy, rice and noodles do not survive
 the freezer, so add those to the bowl instead of the pot.
 
+## Every day gets its own afternoon meal
+
+The `snack` field started life on the week rather than the day, which meant the same line
+rendered all seven days. Combined with eggs at lunch and gyeranjjim at dinner, Thursday
+of Week 1 was eggs three times. It is now per-day: 28 distinct afternoon meals, none
+repeating the protein of that day's lunch or dinner. `/tmp/mealcheck.js`-style validation
+catches regressions by tagging each meal's protein and flagging any that appears in all
+three slots.
+
+They are chosen for satiety rather than protein alone: yogurt with berries and chia for
+the sweet craving, edamame and hummus for crunch and fiber, biltong for savory, a bowl of
+soup when both numbers are short.
+
 ## Dairy is optional throughout
 
 He is lactose intolerant, and cottage cheese was originally the first thing on the

@@ -95,7 +95,7 @@ $('#days').innerHTML = w.days.map((d, i) => {
       <span class="pill ${d.lift ? 'lift' : 'rest'}">${d.lift ? 'Tonal' : 'No lift'}</span>
     </div>
     <div class="meal"><span class="when">${esc(win.first)}</span><span class="what">${esc(d.m1)}${m1r}</span></div>
-    ${w.snack ? `<div class="meal"><span class="when">${esc(win.snack)}</span><span class="what">${esc(w.snack)} <a href="fuel.html">why</a></span></div>` : ''}
+    ${(d.snack || w.snack) ? `<div class="meal"><span class="when">${esc(win.snack)}</span><span class="what">${esc(d.snack || w.snack)} <a href="fuel.html">why</a></span></div>` : ''}
     <div class="meal"><span class="when">${esc(win.dinner)}</span><span class="what">${esc(d.m2)}${m2r}</span></div>
     ${also.length ? `<div class="alsoline">Also: ${also.map(id => `<a href="recipes.html#${id}">${esc(RECIPES[id].name)}</a>`).join(', ')}</div>` : ''}
     ${d.post ? `<div class="postnote">${esc(d.post)}</div>` : ''}
