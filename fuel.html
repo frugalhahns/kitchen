@@ -70,6 +70,18 @@ $('#main').innerHTML = `
     ${FUEL.soup.caveats.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
   </div>
 
+  <h2>${esc(FUEL.gut.title)}</h2>
+  <p class="muted">${esc(FUEL.gut.body)}</p>
+  <div class="card">
+    <h3 style="margin-top:0">Dairy, ranked</h3>
+    ${FUEL.gut.dairy.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+    <div class="flag reset" style="margin-top:.9rem"><b>The test:</b> ${esc(FUEL.gut.test)}</div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Loose stool, and what in here touches it</h3>
+    ${FUEL.gut.stool.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+
   <h2>${esc(FUEL.waist.title)}</h2>
   <p class="muted">${esc(FUEL.waist.body)}</p>
   <div class="card">
@@ -93,13 +105,13 @@ $('#main').innerHTML = `
   <h2>The afternoon meal</h2>
   <div class="card">
     <div class="flag reset"><b>${esc(win.snack)}, week ${w.n} ${esc(w.cuisine)}:</b> ${esc(w.snack)}</div>
-    <p class="muted" style="margin:.6rem 0 0">Each week has its own version on the <a href="index.html">week view</a>, built around whichever sauce jar is already open. Below is the full list, best protein per calorie first.</p>
+    <p class="muted" style="margin:.6rem 0 0">Each week has its own version on the <a href="index.html">week view</a>, built around whichever sauce jar is already open. Below is the full list, ordered so the no-lactose options come first.</p>
   </div>
   <div class="card">
     <table class="log">
-      <thead><tr><th>What</th><th>Protein</th><th>Calories</th><th>Notes</th></tr></thead>
+      <thead><tr><th>What</th><th>Protein</th><th>Lactose</th><th>Calories</th><th>Notes</th></tr></thead>
       <tbody>${FUEL.snacks.map(s2 => `<tr>
-        <td><b>${esc(s2.what)}</b></td><td>${esc(s2.protein)}</td><td>${esc(s2.kcal)}</td><td class="nw">${esc(s2.note)}</td>
+        <td><b>${esc(s2.what)}</b></td><td>${esc(s2.protein)}</td><td>${esc(s2.lactose)}</td><td>${esc(s2.kcal)}</td><td class="nw">${esc(s2.note)}</td>
       </tr>`).join('')}</tbody>
     </table>
   </div>

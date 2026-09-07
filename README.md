@@ -83,6 +83,15 @@ all of it. The two honest caveats are on the Fuel page: a bowl is often 25 to 30
 protein rather than 50, so pair it, and potato, dairy, rice and noodles do not survive
 the freezer, so add those to the bowl instead of the pot.
 
+## Dairy is optional throughout
+
+He is lactose intolerant, and cottage cheese was originally the first thing on the
+afternoon protein list, which was wrong: a cup carries 6 to 8g of lactose, more than
+Greek yogurt and far more than aged cheese. The list is now ordered with the no-lactose
+options first and every week's afternoon meal defaults to something without dairy. The
+Fuel page carries the ranking, the isolate-not-concentrate distinction for protein
+powder, and the two-week elimination test.
+
 ## The protein mix
 
 Every week is built to two fish nights, two chicken nights and two red meat nights, with
