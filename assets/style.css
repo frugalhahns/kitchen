@@ -397,3 +397,5 @@ table.log td.nw { font-variant-numeric: normal; color: var(--ink-2); font-size: 
 .alsoline { margin-top: .5rem; font-size: .8rem; color: var(--ink-3); }
 .alsoline a { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
 table.log td:nth-child(2), table.log td:nth-child(3) { white-space: nowrap; }
+table.log tr.tot td { border-top: 2px solid var(--line); font-weight: 600; }
+.inputrow select { font: inherit; padding: .45rem .5rem; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); }

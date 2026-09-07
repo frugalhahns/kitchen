@@ -20,6 +20,8 @@ const CONFIG = {
   birthday: '2026-10-15',
   // Eating window (16:8). Hold it loosely, see the Plan page.
   window: { start: '12:00 pm', end: '8:00 pm' },
+  // Third eating occasion, inside the window. See the Fuel page for why.
+  snackTime: '3:30 pm',
   // Protein target, grams/day. Roughly 1g per lb of goal bodyweight.
   proteinTarget: 170,
   liftDays: ['Mon', 'Tue', 'Thu', 'Fri'],
@@ -799,6 +801,7 @@ const WEEKS = [
     cuisine: 'Korean',
     theme: 'Short ribs on Sunday for Monday dinner and Tuesday lunch, a tray of chicken thighs that covers two nights, doenjang salmon on Wednesday and six minutes of bulgogi on Friday. Five bags go to the freezer, which is the start of the bank that eventually lets you pick any night you like.',
     protein: '2 chicken nights, 2 red meat nights, 1 oily fish night, sardines and eggs at lunch.',
+    snack: 'Cottage cheese with gochugaru, sesame oil and cucumber. Or 4 oz of cold short rib.',
     cookTime: '85 min',
     cook: [
       { at: '0:00', do: 'Oven to 425F. Chicken thighs patted dry, tossed with gochugaru, salt and oil, skin up on a sheet pan. In for 40 minutes.', why: 'Longest oven item goes first and needs nothing from you after this.' },
@@ -875,6 +878,7 @@ const WEEKS = [
     cuisine: 'Mexican',
     theme: 'One pork shoulder carries Monday and Tuesday, chile-lime chicken takes Wednesday, fish on Thursday and carne asada off the grill on Friday. The salsa is what stops any of it tasting like the same dinner twice. Four bags go in the freezer raw.',
     protein: '2 pork nights, 1 chicken night, 1 fish night, 1 beef night, sardines and eggs at lunch.',
+    snack: 'Cottage cheese with salsa and lime. Or 4 oz of cold carnitas, which is better than it sounds.',
     cookTime: '70 min',
     cook: [
       { at: '0:00', do: 'Pork shoulder, salt, cumin, oregano, the squeezed orange, onion, garlic and half a cup of water into the Instant Pot. 45 minutes at pressure.', why: 'Biggest and slowest thing, and it is completely unattended.' },
@@ -949,6 +953,7 @@ const WEEKS = [
     cuisine: 'Middle Eastern',
     theme: 'The sauces carry this week. One tray of shawarma chicken plus tahini on Monday and zhoug on Tuesday is two different dinners out of the same pan. Kofta on Wednesday, fish on Thursday, wings on Friday, and half the kofta go in the freezer raw. This is the lightest week for red meat in the cycle.',
     protein: '2 chicken nights, 1 fish night, 1 beef or lamb night, 1 wings night, sardines and eggs at lunch.',
+    snack: 'Greek yogurt with a spoon of zhoug. Or 4 oz of chicken with tahini sauce.',
     cookTime: '75 min',
     cook: [
       { at: '0:00', do: 'Oven to 425F. Chicken thighs tossed with the shawarma spice mix, oil and salt, across two sheet pans. In for 40 minutes.', why: 'Same sheet-pan chicken as every other week. Only the spice changed.' },
@@ -1021,6 +1026,7 @@ const WEEKS = [
     title: 'The Light Week',
     cuisine: 'Spanish and American',
     protein: '1 fish night, 1 shrimp night, 3 red meat nights, one of them the vegetable-heavy soup. Run the soup with chicken instead if the cycle has been red-meat heavy.',
+    snack: 'Greek yogurt with romesco. Or a cup of the soup, which is the easiest 25g in the plan.',
     theme: 'An hour, and forty minutes of it is a pot doing its own thing. Most of the work is moving food from the freezer to the fridge, which is what three weeks of banking bought you. Week 4 being easy is the design and not a gap, because a plan you can repeat at seventy percent for a year beats one you follow perfectly for five weeks.',
     cookTime: '60 min, 40 of it unattended',
     cook: [
@@ -1099,7 +1105,8 @@ const PROTOCOL = {
     { rule: 'Protein first, and a lot of it. Target 170g a day.', detail: 'Beef, pork, chicken, eggs, sardines and wild fish. Protein is what makes a deficit survivable and it is what keeps the muscle you are building on the Tonal rather than losing it alongside the fat.' },
     { rule: 'Fish twice a week, chicken twice, red meat twice.', detail: 'Every week in the cycle is built to that shape, with sardines at lunch as the second fish. The reason is your cholesterol history: saturated fat is the main dietary lever on ApoB and the fattiest cuts here, short ribs and pork shoulder and wings, are anchors rather than staples. Oily fish is the one thing on this plan that nothing else replaces. See the protein section on this page for what to do with the week 12 numbers.' },
     { rule: 'Ten pounds of vegetables a week, from the market.', detail: 'It sounds like a lot and it is roughly right for two adults. Buy for the slot rather than the recipe: roasting vegetables, sturdy greens, something raw and crunchy, herbs, alliums. Then roast a sheet pan of whatever it was.' },
-    { rule: 'Eat between noon and 8pm, and hold it loosely.', detail: 'Black coffee, tea and water in the morning. The window is a tool for eating less without counting, not a rule with moral weight. If you lift in the morning, shift it earlier rather than training fasted and waiting until noon.' },
+    { rule: 'Three eating occasions inside the window, not two.', detail: 'Noon, around 3:30pm, and dinner. Two meals a day quietly delivers about 120g of protein against a 170g target and a deficit big enough to cost you muscle, which is a fat-loss plan rather than the recomposition you actually want. The afternoon one is a protein meal, not a snack: cottage cheese, yogurt, or four ounces of whatever is already cooked. The Fuel page has the arithmetic and your numbers.' },
+    { rule: 'Eat between noon and 8pm, and hold it loosely.', detail: 'Black coffee, tea and water in the morning. The window is a tool for eating less without counting, not a rule with moral weight. If you lift in the morning, shift the whole window earlier rather than eating outside it. Do not solve the protein problem with breakfast, solve it at 3:30pm.' },
     { rule: 'Fats from animals, olives and avocados.', detail: 'Butter, ghee, tallow, the fat off the chicken pan, olive oil, avocado oil, sesame oil. Save every rendered fat, it is the best thing you will cook with all week and it is free.' },
     { rule: 'Alcohol goes with the free meal, if at all.', detail: 'It stalls fat loss out of proportion to its calories and it reliably wrecks the decisions that keep the rest of this intact. Attaching it to the one free meal means you never have to decide about it on a Tuesday.' },
     { rule: 'Walk ten to fifteen minutes after dinner. Every night.', detail: 'This is the highest-return habit on the whole site and it is not exercise, it is glucose management. Walking right after a meal pulls glucose into muscle without insulin. With a prediabetes history it does more per minute than anything else here. Take your son.' },
@@ -1222,6 +1229,60 @@ const KEEPS = {
   ],
 };
 
+/* ---------- Fuel: calories, protein and the third eating occasion ---------- */
+
+const FUEL = {
+  headline: 'Two meals a day was quietly delivering about 120g of protein against a 170g target, and a deficit big enough to cost you muscle. This page is the fix, and it is three eating occasions rather than two.',
+  verdict: {
+    title: 'The honest answer about losing fat and gaining muscle at the same time',
+    points: [
+      { p: 'It is possible, and you are a good candidate for it.', d: 'Simultaneous fat loss and muscle gain works best for people carrying extra fat, returning to lifting rather than years into it, eating high protein, and in a modest deficit. That is a description of you. It stops working for lean, well-trained people, which is where most of the internet pessimism comes from.' },
+      { p: 'But it is slow, and lopsided.', d: 'Expect fat to come off at half a pound to a pound a week and muscle to arrive at maybe half a pound a month, some months none. What moves fast is strength: the Tonal numbers will climb well before the mirror changes, because early strength is largely your nervous system learning the movement. Do not read a flat scale as failure when the weights are going up and the waist is going down.' },
+      { p: 'The deficit size is the whole game.', d: 'A 300 to 500 calorie deficit lets you build while losing. A 1,000 calorie deficit turns your body into a scavenger and it will take muscle along with the fat, high protein or not. As written, this plan was closer to the second, which is exactly why it needs the afternoon meal rather than more discipline.' },
+      { p: 'You cannot target the belly, and you do not need to.', d: 'There is no food or exercise that removes fat from one place. What is true is that visceral fat around the middle is the most metabolically responsive kind and it tends to go early on this way of eating, which is why the waist tape usually moves before the scale does.' },
+      { p: 'Protein is the one number that is doing double duty.', d: 'It is what makes the deficit survivable, it is what keeps the muscle, and it is the most filling thing on the plate. If you can only get one number right, get this one. Everything else on this page is downstream of it.' },
+    ],
+  },
+  math: {
+    title: 'Your numbers',
+    body: 'Mifflin-St Jeor for the resting rate, an activity multiplier for the lifting and the walking, then a deficit that leaves room to build. Nothing you type here leaves this browser or gets committed to the repo, same as the Progress page.',
+    caveat: 'Every calculator like this is an estimate with about a ten percent error bar on it, so treat the number as a starting point and let two weeks of waist and weight data correct it. The Progress page is the real instrument. This is just the opening guess.',
+  },
+  day: {
+    title: 'How the day should actually add up',
+    body: 'Three eating occasions inside the same noon to 8pm window. Not breakfast, which would cost you the fasting hours that are doing real work on your glucose. The afternoon meal goes in the middle, and on lift days it lands close to training.',
+    rows: [
+      { when: 'Noon', what: 'The first meal: sardine plate, eggs and leftovers, or last night dinner cold', protein: '55 to 65g', kcal: '700 to 800' },
+      { when: '3:30 pm', what: 'The protein meal. This is the new one and it is the whole point of this page.', protein: '25 to 35g', kcal: '200 to 300' },
+      { when: '7 pm', what: 'Dinner: 8 oz of cooked protein, two cups of vegetables, fat', protein: '55 to 70g', kcal: '700 to 900' },
+      { when: 'Total', what: 'Three occasions, no snacking between them', protein: '145 to 170g', kcal: '1,600 to 2,000' },
+    ],
+    note: 'The portion sizes matter more than the food choices here. Six ounces of cooked meat is about 45g of protein and it looks like a smallish piece on a big plate, which is how a day that felt like plenty comes in at 120g. Weigh your dinner protein twice, once this week and once in a month, and you will not need to weigh it again.',
+  },
+  snacks: [
+    { what: 'Cottage cheese, 1 cup, low fat', protein: '26g', kcal: '180', note: 'The best protein per calorie on the list. Gochugaru and cucumber in Korean week, salsa and lime in Mexican, zhoug in Middle Eastern. It takes the week sauce like everything else does.' },
+    { what: 'Greek yogurt, 1 cup, plain 2 percent', protein: '20g', kcal: '170', note: 'Plain only. Read the label, the flavored ones carry as much sugar as a dessert. Low fat rather than whole given the cholesterol thread, and it is the one dairy that reliably sits well before a lift.' },
+    { what: '4 oz of whatever protein is in the fridge', protein: '30g', kcal: '250', note: 'The best option most days, because it is already cooked and it is what the batch was for. Cold carnitas, a chicken thigh, leftover kofta. Zero decisions.' },
+    { what: '2 soft-boiled eggs and a tin of sardines', protein: '34g', kcal: '300', note: 'The no-fridge-planning version. Both are already in the house because of the pantry list.' },
+    { what: 'A clean whey or casein shake', protein: '25g', kcal: '120', note: 'Highest protein per calorie of anything here. Check that the label is one or two ingredients, which some are. Use it on the days the number is short, not as the default, because chewing food is more filling for the same protein.' },
+    { what: 'Biltong or jerky, 2 oz', protein: '22g', kcal: '160', note: 'For the car and the desk drawer. Read the label, most jerky is glazed in sugar and biltong usually is not.' },
+  ],
+  nots: [
+    { p: 'Nuts are not a protein snack.', d: 'An ounce of almonds is 165 calories and 6g of protein. That is the worst ratio in your pantry and it is extremely easy to eat three ounces without noticing. Nuts are a fat you add on purpose, not a snack you reach for, and they are already on the stall list on the Plan page for exactly this reason.' },
+    { p: 'Do not add breakfast.', d: 'A yogurt at 7am moves your first meal four hours earlier and turns 16:8 into 13:11. The window is not magic, but the overnight fasting hours are one of the levers on your fasting glucose, and you get the same protein by moving that yogurt to 3:30pm at no cost. The exception is already in the plan: if you lift in the morning, shift the whole window earlier rather than eating outside it.' },
+    { p: 'Do not eat between the three meals.', d: 'Three defined occasions is a structure. Three occasions plus grazing is just eating all day, and it is the most common way a plan like this quietly stops producing a deficit. Cheese and nuts at 5pm are the usual culprits.' },
+    { p: 'Do not chase the deficit lower when progress stalls.', d: 'The instinct is to cut more. At a 500 calorie deficit with 170g of protein and four lifts a week, a stall is almost never too many calories in the food you planned. It is the food you did not plan, or the free meal expanding, or sleep, or water weight sitting on top of real fat loss. Cutting to 1,200 calories will cost you the muscle you are training for.' },
+  ],
+  adjust: [
+    { signal: 'Waist down, weight flat or down slowly', do: 'This is exactly what recomposition looks like. Change nothing. This is the outcome you asked for and it is the one most likely to get abandoned because the scale is boring.' },
+    { signal: 'Waist and weight both flat for three weeks', do: 'Take 200 calories off dinner, usually by dropping the added cooking fat rather than the protein. Recheck in two weeks. Do not touch the protein number.' },
+    { signal: 'Losing faster than 1.5 lb a week for two weeks', do: 'Too fast for building. Add 200 to 300 calories back, and put them in the afternoon meal. Fast loss at 40 in a deficit is mostly a good way to arrive lighter and softer.' },
+    { signal: 'Tonal numbers going backwards two sessions running', do: 'Under-fueled or under-slept, in that order. Add 250 calories and check you are hitting the protein number for real rather than in theory. Strength should be flat or climbing throughout a modest deficit.' },
+    { signal: 'Hungry and flat all afternoon', do: 'Protein at the noon meal is too low, not calories overall. Front-load it: 60g at noon changes the whole afternoon, and it is the single most common fix.' },
+    { signal: 'Everything is working', do: 'Then stop adjusting. The plan gets a full four weeks before any change, because two weeks of data at this rate of change is mostly noise.' },
+  ],
+};
+
 /* ---------- What a full freezer bank looks like ---------- */
 
 const BANK = {
@@ -1294,9 +1355,9 @@ const TRAINING = {
   layers: [
     { thing: 'A 10 to 15 minute walk after dinner, every single night', why: 'The highest-leverage habit on this site, and it is not exercise, it is glucose management. Walking right after a meal pulls glucose into muscle without insulin and blunts the post-meal rise substantially. With a prediabetes history it does more per minute than anything else here. Take your son.' },
     { thing: '8,000 to 10,000 steps a day', why: 'Not for the calories. Daily movement is what keeps your metabolic rate from sagging during a deficit, and it is the first thing to quietly disappear when work gets busy.' },
-    { thing: 'Protein within 90 minutes of lifting, 40 to 50g', why: 'You are 40 and in a calorie deficit, which is the exact situation where muscle gets lost alongside fat. Protein plus the Tonal is what makes the weight you lose be fat.' },
+    { thing: 'Protein within 90 minutes of lifting, 40 to 50g', why: 'You are 40 and in a calorie deficit, which is the exact situation where muscle gets lost alongside fat. Protein plus the Tonal is what makes the weight you lose be fat. The 3:30pm meal exists partly for this: on an afternoon lift it lands either side of the session, and on a morning lift it is the top-up. See the Fuel page.' },
     { thing: 'Sleep 7 hours or the rest of this works less well', why: 'Short sleep raises insulin resistance and appetite measurably within days. It is not a moral issue, it is the same lever as the food.' },
     { thing: 'Measure your waist weekly, same time, same place', why: 'The scale moves for a dozen reasons that are not fat. Your waist at the navel, first thing Saturday morning, is the number that answers the belly-fat question. Log it on the Progress page.' },
   ],
-  ifNote: 'If you lift in the morning and hate waiting until noon to eat, shift the window earlier rather than pushing through. 10am to 6pm works. The fasting length matters far less than the protein total and the food quality, and training four days a week while eating nothing until noon is a good way to quit in week three.',
+  ifNote: 'If you lift in the morning and hate waiting until noon to eat, shift the window earlier rather than pushing through. 10am to 6pm works, with the three eating occasions sliding along with it. The fasting length matters far less than the protein total and the food quality, and training four days a week while eating nothing until noon is a good way to quit in week three.',
 };

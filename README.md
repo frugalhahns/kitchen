@@ -20,6 +20,8 @@ light Spanish and American week that mostly comes out of the freezer.
   actually at a market in September, October and November
 - **Recipes** - 29 dishes, none over eight ingredients or four steps, each with its
   fridge and freezer life and the modification that keeps it free of sugar and grain
+- **Fuel** - the honest answer on losing fat while gaining muscle, a calorie and protein
+  calculator that stores nothing outside the browser, and the third eating occasion
 - **Training** - four days on the Tonal, the food timing around it, and the walking
 - **The Plan** - the rules, why each one is there, and what to do when it stalls
 - **Eating Out** - how to take the free meal, then how to order at seven kinds of
@@ -44,6 +46,15 @@ variety comes from and it costs nothing in effort.
 pizza included. The earlier version of this plan had no exception in it and that is
 exactly why it did not survive. A plan run at seventy percent for a year beats one run
 perfectly for five weeks.
+
+## Three eating occasions, not two
+
+The plan originally ran two meals inside a 16:8 window, which quietly delivered about
+120g of protein against its own 170g target, at a deficit steep enough to cost muscle.
+That is a fat-loss plan, not the recomposition it claimed. The fix is a protein meal at
+3:30pm, inside the existing window rather than as breakfast, because the overnight
+fasting hours are doing real work on fasting glucose. Each week has its own version built
+around whichever sauce jar is already open, and the Fuel page carries the arithmetic.
 
 ## The protein mix
 
@@ -75,6 +86,8 @@ Common edits:
 | Change what is in the fridge and by when | the `keeps` array on the week |
 | Change what gets banked | the `freezer` array on the week, `{ what, months }` |
 | Change lift days | `CONFIG.liftDays` |
+| Move the afternoon meal | `CONFIG.snackTime`, and `snack` on each week |
+| Change the protein target | `CONFIG.proteinTarget`, which the Fuel page checks against |
 | Move the free meal | `CONFIG.freeMealDay`, and the `free: true` day in `WEEKS` |
 
 To preview locally:

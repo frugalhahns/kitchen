@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuel - Reset Kitchen</title>
+<meta name="description" content="Calories, protein, and the third eating occasion.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('fuel.html');
+const w = weekData();
+
+$('#main').innerHTML = `
+  <h1>Fuel</h1>
+  <p class="lede">${esc(FUEL.headline)}</p>
+
+  <h2>${esc(FUEL.verdict.title)}</h2>
+  <div class="card">
+    ${FUEL.verdict.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+
+  <h2>${esc(FUEL.math.title)}</h2>
+  <p class="muted">${esc(FUEL.math.body)}</p>
+  <div class="card">
+    <div class="inputrow">
+      <label>Weight now (lb)<input type="number" step="1" id="wt" inputmode="decimal"></label>
+      <label>Goal weight (lb)<input type="number" step="1" id="gw" inputmode="decimal"></label>
+      <label>Height (in)<input type="number" step="0.5" id="ht" inputmode="decimal"></label>
+      <label>Age<input type="number" step="1" id="ag" inputmode="numeric"></label>
+      <label>Activity<select id="ac">
+        <option value="1.35">Desk job, not much walking</option>
+        <option value="1.5" selected>Desk job, 4 lifts and 8 to 10k steps</option>
+        <option value="1.65">On your feet, 4 lifts and lots of walking</option>
+      </select></label>
+      <button id="save">Work it out</button>
+    </div>
+    <div id="out"></div>
+  </div>
+
+  <h2>${esc(FUEL.day.title)}</h2>
+  <p class="muted">${esc(FUEL.day.body)}</p>
+  <div class="card">
+    <table class="log">
+      <thead><tr><th>When</th><th>Protein</th><th>Calories</th><th>What</th></tr></thead>
+      <tbody>${FUEL.day.rows.map((r, i) => `<tr${i === FUEL.day.rows.length - 1 ? ' class="tot"' : ''}>
+        <td><b>${esc(r.when)}</b></td><td>${esc(r.protein)}</td><td>${esc(r.kcal)}</td><td class="nw">${esc(r.what)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <p class="muted" style="margin:.8rem 0 0">${esc(FUEL.day.note)}</p>
+  </div>
+
+  <h2>The afternoon meal</h2>
+  <div class="card">
+    <div class="flag reset"><b>Week ${w.n}, ${esc(w.cuisine)}:</b> ${esc(w.snack)}</div>
+    <p class="muted" style="margin:.6rem 0 0">Each week has its own version on the <a href="index.html">week view</a>, built around whichever sauce jar is already open. Below is the full list, best protein per calorie first.</p>
+  </div>
+  <div class="card">
+    <table class="log">
+      <thead><tr><th>What</th><th>Protein</th><th>Calories</th><th>Notes</th></tr></thead>
+      <tbody>${FUEL.snacks.map(s2 => `<tr>
+        <td><b>${esc(s2.what)}</b></td><td>${esc(s2.protein)}</td><td>${esc(s2.kcal)}</td><td class="nw">${esc(s2.note)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>
+
+  <h2>What not to do</h2>
+  <div class="card">
+    ${FUEL.nots.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+
+  <h2>When to change something, and what</h2>
+  <p class="muted">Read these off the <a href="track.html">Progress page</a> every fourth Saturday, not every Saturday. Change one thing at a time.</p>
+  <div class="card">
+    ${FUEL.adjust.map(a => `<div class="qa"><b>${esc(a.signal)}</b><p>${esc(a.do)}</p></div>`).join('')}
+  </div>
+`;
+
+/* ---------- the calculator ---------- */
+
+const K = 'fuel';
+const f = store.get(K, {});
+['wt', 'gw', 'ht', 'ag'].forEach(id => { if (f[id]) $('#' + id).value = f[id]; });
+if (f.ac) $('#ac').value = f.ac;
+
+function calc() {
+  const wt = +$('#wt').value, gw = +$('#gw').value, ht = +$('#ht').value, ag = +$('#ag').value, ac = +$('#ac').value;
+  if (!wt || !ht || !ag) {
+    $('#out').innerHTML = '<p class="muted">Fill in weight, height and age and it will work the rest out. Nothing is sent anywhere.</p>';
+    return;
+  }
+  store.set(K, { wt, gw, ht, ag, ac });
+
+  const kg = wt * 0.45359237, cm = ht * 2.54;
+  const bmr = Math.round(10 * kg + 6.25 * cm - 5 * ag + 5);
+  const tdee = Math.round(bmr * ac);
+
+  // 15 percent below burn, but never so steep that it costs muscle:
+  // capped at 1 percent of bodyweight a week, and floored at 300 so it still does something.
+  const r25 = (n) => Math.round(n / 25) * 25;
+  const capFromWeight = wt * 0.01 * 3500 / 7;
+  const deficit = Math.round(Math.max(300, Math.min(tdee * 0.15, capFromWeight, 750)));
+  const target = r25(tdee - deficit);
+  const lo = r25(target - 150);
+  const hi = r25(target + 150);
+
+  const basis = gw && gw < wt ? gw : Math.round(wt * 0.85);
+  const pro = Math.round(basis / 5) * 5;
+  const proLo = Math.round(basis * 0.9 / 5) * 5;
+  const fatMin = Math.round(basis * 0.35 / 5) * 5;
+  const proKcal = pro * 4, fatKcal = fatMin * 9;
+  const restKcal = target - proKcal - fatKcal;
+
+  const perWeek = (tdee - target) * 7 / 3500;
+  const pctWeek = perWeek / wt * 100;
+  const toGoal = gw && gw < wt ? Math.ceil((wt - gw) / perWeek) : null;
+
+  const tooFast = pctWeek > 1.1;
+  const plan170 = Math.abs(pro - CONFIG.proteinTarget) > 20;
+
+  // The three occasions on this food land around 1,800. Say out loud what to do
+  // about the gap, rather than leaving two numbers on the page contradicting each other.
+  const planMid = 1800;
+  const gap = target - planMid;
+  let gapNote = '';
+  if (gap > 200) {
+    const adds = Math.round(gap / 130);
+    gapNote = `<div class="flag keeps" style="margin-top:.9rem"><b>Mind the gap.</b>
+      The three eating occasions in the table below come to roughly ${planMid.toLocaleString()} calories as written, and you need
+      ${target.toLocaleString()}. So add about ${adds} of these a day, on top of the plan:
+      a tablespoon of olive oil over the vegetables (120), two more ounces of dinner protein (120 calories and 15g of protein),
+      half an avocado (120), two eggs (140), or a second cup of cottage cheese in the afternoon (180).
+      Under-eating on a plan like this is far more common than over-eating, because the food is filling and nobody is counting.</div>`;
+  } else if (gap < -200) {
+    gapNote = `<div class="flag keeps" style="margin-top:.9rem"><b>Mind the gap.</b>
+      The three occasions below come to roughly ${planMid.toLocaleString()} calories and your target is ${target.toLocaleString()},
+      so trim about ${Math.abs(gap)}. Take it off the added cooking fat and the fattiest cuts first, never off the protein:
+      less oil on the sheet pan, six ounces of dinner protein instead of eight, and skip the second avocado.</div>`;
+  }
+
+  $('#out').innerHTML = `
+    <div class="stat">
+      <div><b>${target.toLocaleString()}</b><span>Calories a day</span></div>
+      <div><b>${pro}g</b><span>Protein a day</span></div>
+      <div><b>${perWeek.toFixed(1)} lb</b><span>Fat loss a week</span></div>
+      <div><b>${tdee.toLocaleString()}</b><span>What you burn</span></div>
+    </div>
+    <div class="flag reset" style="margin-top:.9rem">
+      <b>Your plan:</b> eat about <b>${target.toLocaleString()} calories</b> and <b>${pro}g of protein</b> a day, across three occasions.
+      That is a ${(tdee - target).toLocaleString()} calorie deficit, about ${Math.round((tdee - target) / tdee * 100)} percent below your burn, which is the range that lets you lose fat and still build.
+      Anywhere from ${lo.toLocaleString()} to ${hi.toLocaleString()} works. Below ${lo.toLocaleString()} you start paying for it in muscle and in Tonal numbers.
+    </div>
+    <table class="log" style="margin-top:.9rem">
+      <thead><tr><th>Number</th><th>Value</th><th>Where it comes from</th></tr></thead>
+      <tbody>
+        <tr><td><b>Resting rate</b></td><td>${bmr.toLocaleString()}</td><td class="nw">Mifflin-St Jeor, what you would burn asleep all day.</td></tr>
+        <tr><td><b>Daily burn</b></td><td>${tdee.toLocaleString()}</td><td class="nw">Resting rate times ${ac}, for four lifts a week plus the walking.</td></tr>
+        <tr><td><b>Eat</b></td><td>${target.toLocaleString()}</td><td class="nw">A ${(tdee - target).toLocaleString()} deficit, ${Math.round((tdee - target) / tdee * 100)} percent below burn and no more than 1 percent of bodyweight a week. Modest on purpose, so the lifting still builds something.</td></tr>
+        <tr><td><b>Protein</b></td><td>${proLo} to ${pro}g</td><td class="nw">About 1g per lb of ${gw && gw < wt ? 'goal' : 'estimated lean'} bodyweight, which is ${basis} lb. Non-negotiable, and the number this plan was failing to hit.</td></tr>
+        <tr><td><b>Fat, minimum</b></td><td>${fatMin}g</td><td class="nw">Floor for hormones. You will land well above it on this food, which is fine.</td></tr>
+        <tr><td><b>Everything else</b></td><td>${restKcal > 0 ? restKcal.toLocaleString() + ' kcal' : 'covered'}</td><td class="nw">More fat, more protein, and 40 to 80g of carbohydrate from ten pounds of vegetables a week.</td></tr>
+        ${toGoal ? `<tr><td><b>Time to ${gw} lb</b></td><td>${toGoal} weeks</td><td class="nw">At this rate, if nothing stalls. It always stalls somewhere, so add a month.</td></tr>` : ''}
+      </tbody>
+    </table>
+    ${gapNote}
+    ${tooFast ? `<div class="flag kid" style="margin-top:.9rem"><b>That rate is a bit quick.</b> ${pctWeek.toFixed(1)} percent of bodyweight a week is above the one percent where muscle usually starts going too. Eat at the top of the band, ${hi.toLocaleString()}, and accept the slower line on the chart.</div>` : ''}
+    ${plan170 ? `<div class="flag kid" style="margin-top:.9rem"><b>Worth updating the site.</b> Your protein number works out to ${pro}g, and <code>CONFIG.proteinTarget</code> in <code>data/plan.js</code> currently says ${CONFIG.proteinTarget}g. Change it there so every page agrees with you.</div>` : ''}
+    <p class="muted" style="margin-top:.9rem">${esc(FUEL.math.caveat)}</p>`;
+}
+
+$('#save').onclick = calc;
+['wt', 'gw', 'ht', 'ag'].forEach(id => { $('#' + id).onchange = calc; });
+$('#ac').onchange = calc;
+calc();
+</script>
+</body>
+</html>

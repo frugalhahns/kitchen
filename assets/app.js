@@ -8,6 +8,7 @@ const PAGES = [
   { file: 'cook.html', label: 'Cook Day' },
   { file: 'shopping.html', label: 'Shopping' },
   { file: 'recipes.html', label: 'Recipes' },
+  { file: 'fuel.html', label: 'Fuel' },
   { file: 'train.html', label: 'Training' },
   { file: 'plan.html', label: 'The Plan' },
   { file: 'eatout.html', label: 'Eating Out' },
