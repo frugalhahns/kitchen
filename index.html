@@ -33,10 +33,20 @@ if (!st.started) {
 }
 
 $('#main').innerHTML = `
-  <h1>Week ${w.n}: ${esc(w.title)} <span class="cuis">${esc(w.cuisine)}</span></h1>
-  <p class="lede">${esc(w.theme)}</p>
-  ${w.protein ? `<p class="muted"><b>Protein this week:</b> ${esc(w.protein)}</p>` : ''}
-  ${st.started && !st.done ? `<div class="bar"><i style="width:${pct}%"></i></div><p class="muted">Week ${st.resetWeek} of ${CONFIG.resetWeeks} in the reset. Cycle week ${st.cycleWeek} of ${WEEKS.length}.</p>` : ''}
+  <header class="mast">
+    <span class="num" aria-hidden="true">${w.n}</span>
+    <p class="eyebrow"><span class="dot"></span>Week ${w.n} of the cycle<span class="dot"></span>${esc(w.cuisine)}</p>
+    <h1>${esc(w.title)}</h1>
+    <p class="lede">${esc(w.theme)}</p>
+    <div class="facts">
+      <div><span>Stew nights</span><b>${w.days.slice(0, 5).filter(d => /soup|stew|jjigae|chili|brais/i.test(d.m2)).length} of 5</b></div>
+      <div><span>Cook day</span><b>Sunday ${esc(fmtShort(cookDay))}, ${esc(w.cookTime)}</b></div>
+      <div><span>Dinners</span><b>${esc(dinnerMix(w))}</b></div>
+      <div><span>Into the freezer</span><b>${w.freezer.length} kind${w.freezer.length === 1 ? '' : 's'}</b></div>
+      ${st.started && !st.done ? `<div><span>Reset</span><b>Week ${st.resetWeek} of ${CONFIG.resetWeeks}</b></div>` : ''}
+    </div>
+    ${st.started && !st.done ? `<div class="bar" style="margin-top:var(--s-3)"><i style="width:${pct}%"></i></div>` : ''}
+  </header>
   <div id="wb"></div>
   <div id="win"></div>
   ${banner}

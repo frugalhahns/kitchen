@@ -131,6 +131,30 @@ your labs in mind" on the Plan page.
 
 ## The interface
 
+**A display serif carries the voice.** Headings and the masthead use a system serif
+stack (Iowan Old Style, Palatino, Charter, Georgia) against sans for reading. No web
+font request, so it stays a zero-dependency site, and it is most of what makes it feel
+like a place rather than a document.
+
+**The week paints the site.** Each cuisine owns an accent, applied as
+`body[data-cuisine]` from the active week, so the site changes character as the cycle
+rotates: gochugaru red for Korean, tomatillo green for Mexican, turmeric for Middle
+Eastern, a Mediterranean blue for the Spanish and American week. All four are contrast
+checked at >= 5:1 on cream and for white text sitting on them, in both modes. The chart
+series colours are deliberately excluded from the theming, because colour there follows
+the measure, not the context.
+
+**The week view opens with a masthead** rather than an h1 and a paragraph: a bled
+watermark numeral, a radial wash in the week's accent, and a facts row (stew nights,
+cook day and time, the dinner protein mix, freezer kinds) with the mix derived from the
+same tagger that labels the meals.
+
+Plus a paper grain over the cream, a rail down the cook-day timeline, cards that lift on
+hover and stagger in on load, accent ticks on section rules, and a focus ring that is
+visible everywhere and removed nowhere.
+
+## The interface
+
 One type scale, one spacing scale, and hairlines doing the separating instead of a
 shadow on every card. The specifics worth knowing:
 

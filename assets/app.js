@@ -108,6 +108,19 @@ const PROTEIN = [
   ['Eggs', /\begg|gyeranjjim/i],
 ];
 
+/* a compact mix of the week's five dinners, derived the same way the tags are */
+function dinnerMix(week) {
+  const counts = {};
+  week.days.slice(0, 5).forEach((d) => {
+    const hit = PROTEIN.find(([, re]) => re.test(d.m2 || ''));
+    if (hit) counts[hit[0]] = (counts[hit[0]] || 0) + 1;
+  });
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, n]) => n + ' ' + k.toLowerCase())
+    .join(' · ');
+}
+
 function proteinTag(text) {
   if (!text) return '';
   const hit = PROTEIN.find(([, re]) => re.test(text));
@@ -137,7 +150,21 @@ function windowPicker(mountSel) {
 
 /* ---------- chrome ---------- */
 
+/* the active week paints the accent, so the site changes character as the
+   cuisine rotates. Chart series colours are not themed. */
+function applyCuisineTheme() {
+  try {
+    const c = (weekData().cuisine || '').toLowerCase();
+    const slug = c.includes('korean') ? 'korean'
+      : c.includes('mexican') ? 'mexican'
+      : c.includes('middle') ? 'mideast'
+      : c.includes('spanish') ? 'spanish' : '';
+    if (slug) document.body.dataset.cuisine = slug;
+  } catch { /* pages without a week keep the default accent */ }
+}
+
 function renderChrome(active) {
+  applyCuisineTheme();
   const st = resetState();
   let phase;
   if (!st.started) phase = 'Starts in ' + st.daysUntil + ' day' + (st.daysUntil === 1 ? '' : 's');

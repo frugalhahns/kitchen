@@ -60,7 +60,7 @@ $('#main').innerHTML = `
       <ul style="margin:0;padding-left:1.2rem">${FUEL.scorecard.cholesterol.points.map(x => `<li style="margin:.4rem 0">${esc(x)}</li>`).join('')}</ul>
     </div>
   </div>
-  <div class="card"><div class="flag reset" style="margin:0"><b>The verdict:</b> ${esc(FUEL.scorecard.verdict)}</div></div>
+  <div class="card"><p class="verdict">${esc(FUEL.scorecard.verdict)}</p></div>
 
   <h2 id="fiber">${esc(FUEL.fiber.title)}</h2>
   <p class="muted">${esc(FUEL.fiber.body)}</p>
