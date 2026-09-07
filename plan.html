@@ -34,6 +34,12 @@ $('#main').innerHTML = `
     ${PROTOCOL.troubleshoot.map(t => `<div class="qa"><b>${esc(t.q)}</b><p>${esc(t.a)}</p></div>`).join('')}
   </div>
 
+  <h2>How long everything keeps</h2>
+  <div class="card">
+    <div class="flag reset"><b>The rule:</b> ${esc(KEEPS.headline)}</div>
+    <p class="muted" style="margin:.6rem 0 0">Cooking once a week only works if none of it gets thrown away, so every recipe carries its own fridge and freezer numbers and the full table lives on the <a href="freezer.html">Storage page</a> along with the thawing rules.</p>
+  </div>
+
   <h2>The pantry</h2>
   <div class="card">
     ${PANTRY.map(p => `<div class="qa"><b>${esc(p.item)}</b><p>${esc(p.why)}</p></div>`).join('')}
@@ -41,8 +47,8 @@ $('#main').innerHTML = `
 
   <h2>How the four-week cycle is built</h2>
   <div class="card">
-    ${WEEKS.map(w => `<div class="qa"><b>Week ${w.n}: ${esc(w.title)} <span class="muted" style="font-weight:400">- ${esc(w.cookTime)} cook day</span></b><p>${esc(w.theme)}</p></div>`).join('')}
-    <p class="muted" style="margin-top:.8rem">Week 4 being easy is the design, not a gap. Three hard cook days followed by a light one is what a person can actually repeat for twelve weeks.</p>
+    ${WEEKS.map(w => `<div class="qa"><b>Week ${w.n}: ${esc(w.title)} <span class="cuis">${esc(w.cuisine)}</span> <span class="muted" style="font-weight:400">${esc(w.cookTime)} cook day</span></b><p>${esc(w.theme)}</p></div>`).join('')}
+    <p class="muted" style="margin-top:.8rem">One cuisine a week is what keeps it simple: one shop, one set of condiments, one spice blend on the sheet-pan chicken. Each cuisine comes around three times across the twelve weeks, and Week 4 being easy is the design rather than a gap.</p>
   </div>
 `;
 </script>

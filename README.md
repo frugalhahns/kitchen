@@ -1,46 +1,56 @@
 # Reset Kitchen
 
-A weekly meal-prep and training site for two adults doing a strict low-carb reset,
-built around batch cooking on Sunday and Korean food that works without sugar or rice.
+A weekly meal-prep and training site for two adults doing a low-carb reset, built
+around one cook day a week, a freezer bank, and simple food from five cuisines that
+works without sugar or grain.
 
 Live at **https://frugalhahns.github.io/kitchen/**
 
 ## What it is
 
-A four-week menu cycle that repeats for a twelve-week reset. Every week has a timed
-Sunday batch-cook plan, a shopping list split by store, five weeknight dinners built
-from what you cooked, and a note for the kid who is not eating any of it.
+A four-week menu cycle that repeats for a twelve-week reset. One cuisine per week, so
+one shop and one set of condiments covers it: Korean, Mexican, Middle Eastern, then a
+light Spanish and American week that mostly comes out of the freezer.
 
-- **This Week** - the seven days, with today highlighted and the current lift days marked
-- **Cook Day** - the Sunday playbook as a timed checklist, ordered so the oven and the
-  boiling water each get used twice
-- **Shopping** - checkable list by store section, prints cleanly
-- **Recipes** - 33 dishes, each with the modification that makes it sugar-free and
-  grain-free, plus a link to the full original recipe
+- **This Week** - the seven days, with today highlighted, lift days marked, the free
+  meal on Saturday, and what is in the fridge with the date it has to be eaten by
+- **Cook Day** - the Sunday playbook as a timed checklist, 45 to 85 minutes depending
+  on the week, ending in what should be in the fridge and what should be banked
+- **Shopping** - farmers market by slot rather than by named vegetable, plus what is
+  actually at a market in September, October and November
+- **Recipes** - 29 dishes, none over eight ingredients or four steps, each with its
+  fridge and freezer life and the modification that keeps it free of sugar and grain
 - **Training** - four days on the Tonal, the food timing around it, and the walking
 - **The Plan** - the rules, why each one is there, and what to do when it stalls
-- **Eating Out** - how to order at six kinds of restaurant, and the fifteen-minute
-  meals to read first
-- **Freezer** - a running count of what is banked
+- **Eating Out** - how to take the free meal, then how to order at seven kinds of
+  restaurant, and the fifteen-minute meals to read before opening a delivery app
+- **Storage** - a dated freezer inventory that flags what is past its window, plus the
+  full fridge and freezer shelf-life table and the thawing rules
 - **Progress** - weight, waist and lab dates
 
-## The one idea worth stealing
+## The three ideas worth stealing
 
-Almost no Korean recipe online is written for a low-carb diet, because the cuisine
-leans hard on sugar, corn syrup, rice syrup and gochujang. Two swaps fix nearly all of it:
+**Cook once, eat it all week.** Sunday makes one big main plus a backup protein and two
+sauces. Monday through Friday is the same food on a different plate. Eating the same
+dinner twice is a feature, because a Tuesday with no decision in it is a Tuesday that
+cannot go wrong.
 
-- **Allulose** in place of sugar and syrups. It browns and caramelizes like sugar and
-  does not raise blood glucose, so galbi marinade, bulgogi and jorim all survive intact.
-- **Gochugaru plus doenjang** in place of gochujang, which is fermented with rice and
-  sweetened. You lose the gloss and keep the flavor.
+**One method, four cuisines.** The sheet-pan chicken, the ground beef and the big soup
+are one recipe each with four spice variants. Gochugaru makes it Korean, cumin and lime
+make it Mexican, and nothing else about the method changes. This is most of where the
+variety comes from and it costs nothing in effort.
 
-Every recipe page states its own version of this in a "Reset version" box.
+**A free meal is in the plan, not a failure of it.** One meal a week, chosen in advance,
+pizza included. The earlier version of this plan had no exception in it and that is
+exactly why it did not survive. A plan run at seventy percent for a year beats one run
+perfectly for five weeks.
 
 ## Editing it
 
 No build step, no dependencies, no framework. Everything the site displays lives in
 [`data/plan.js`](data/plan.js): `CONFIG`, `RECIPES`, `WEEKS`, `PROTOCOL`, `PANTRY`,
-`EATOUT`, `TRAINING`. Edit that file, commit, and GitHub Pages picks it up in a minute.
+`MARKET`, `KEEPS`, `EATOUT`, `TRAINING`. Edit that file, commit, and GitHub Pages picks
+it up in a minute.
 
 Common edits:
 
@@ -50,8 +60,12 @@ Common edits:
 | Change reset length | `CONFIG.resetWeeks` |
 | Fix the birthday | `CONFIG.birthday` |
 | Swap a dinner | the `days` array inside the week in `WEEKS` |
-| Add a recipe | a new key in `RECIPES`, then reference its id as `m2r` on a day |
+| Add a recipe | a new key in `RECIPES`, then reference its id as `m2r` or in `also` on a day |
+| Change a shelf life | `keep: { fridge, freezer }` on the recipe, or the `KEEPS.table` row |
+| Change what is in the fridge and by when | the `keeps` array on the week |
+| Change what gets banked | the `freezer` array on the week, `{ what, months }` |
 | Change lift days | `CONFIG.liftDays` |
+| Move the free meal | `CONFIG.freeMealDay`, and the `free: true` day in `WEEKS` |
 
 To preview locally:
 
@@ -62,7 +76,7 @@ python3 -m http.server 8777
 
 ## Privacy
 
-Checkboxes, freezer counts, session logs and weight entries are stored in
+Checkboxes, the freezer inventory, session logs and weight entries are stored in
 `localStorage` in whoever's browser is looking at it. Nothing is uploaded, there is no
 backend, and no personal or medical information is committed to this repo. The site is
 public because GitHub Pages on a free account has no password option; if that ever

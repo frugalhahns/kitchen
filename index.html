@@ -17,6 +17,7 @@ renderChrome('index.html');
 const w = weekData();
 const st = resetState();
 const mon = mondayForCycleWeek(w.n);
+const cookDay = addDays(mon, -1);
 const todayISO = iso(today());
 const bday = CONFIG.birthday ? parseISO(CONFIG.birthday) : null;
 
@@ -25,13 +26,13 @@ const pct = st.started ? Math.min(100, Math.round((st.resetWeek - 1) / CONFIG.re
 let banner = '';
 if (!st.started) {
   banner = `<div class="card"><b>Week 1 starts Monday ${esc(fmtShort(parseISO(CONFIG.cycleStart)))}.</b>
-    <p class="muted" style="margin:.35rem 0 0">Shop the Saturday before (${esc(fmtShort(addDays(parseISO(CONFIG.cycleStart), -2)))}) and batch cook the Sunday (${esc(fmtShort(addDays(parseISO(CONFIG.cycleStart), -1)))}). Start with the <a href="plan.html">Plan</a> and the <a href="shopping.html">Shopping list</a>.</p></div>`;
+    <p class="muted" style="margin:.35rem 0 0">Farmers market the Saturday before (${esc(fmtShort(addDays(parseISO(CONFIG.cycleStart), -2)))}), cook the Sunday (${esc(fmtShort(addDays(parseISO(CONFIG.cycleStart), -1)))}). Start with the <a href="plan.html">Plan</a> and the <a href="shopping.html">Shopping list</a>.</p></div>`;
 } else if (st.done) {
-  banner = `<div class="card"><b>Twelve weeks done.</b><p class="muted" style="margin:.35rem 0 0">Time to get the bloodwork redrawn and compare it to your baseline. The cycle keeps repeating in the meantime.</p></div>`;
+  banner = `<div class="card"><b>Twelve weeks done.</b><p class="muted" style="margin:.35rem 0 0">Time to get the bloodwork redrawn and compare it to your baseline. The cycle keeps repeating in the meantime, and by now the freezer is doing most of the work.</p></div>`;
 }
 
 $('#main').innerHTML = `
-  <h1>Week ${w.n}: ${esc(w.title)}</h1>
+  <h1>Week ${w.n}: ${esc(w.title)} <span class="cuis">${esc(w.cuisine)}</span></h1>
   <p class="lede">${esc(w.theme)}</p>
   ${st.started && !st.done ? `<div class="bar"><i style="width:${pct}%"></i></div><p class="muted">Week ${st.resetWeek} of ${CONFIG.resetWeeks} in the reset. Cycle week ${st.cycleWeek} of ${WEEKS.length}.</p>` : ''}
   <div id="wb"></div>
@@ -42,12 +43,34 @@ $('#main').innerHTML = `
     <a class="btn" href="recipes.html">All recipes</a>
   </div>
   <div class="grid" id="days"></div>
+
+  <h2>In the fridge, and by when</h2>
+  <div class="card">
+    <p class="muted" style="margin:0 0 .6rem">Cooked Sunday ${esc(fmtShort(cookDay))}. These are the dates to work backwards from, and the reason nothing in this plan gets thrown away.</p>
+    <div id="keeps"></div>
+  </div>
+
   <h2>Into the freezer this week</h2>
-  <div class="card"><ul style="margin:0;padding-left:1.2rem">${w.freezer.map(f => `<li style="margin:.25rem 0">${esc(f)}</li>`).join('')}</ul>
-    <p class="muted" style="margin-top:.7rem">Keep the count current on the <a href="freezer.html">Freezer page</a> so you know what you can pull without opening the door.</p></div>
+  <div class="card">
+    <div id="bank"></div>
+    <p class="muted" style="margin-top:.7rem">Date every bag as it goes in and keep the count current on the <a href="freezer.html">Storage page</a>. Two or three cycles of this and any night can be a reheat of your choosing, which is the whole point of the plan.</p>
+  </div>
 `;
 
 weekBar('#wb');
+
+$('#keeps').innerHTML = (w.keeps || []).map(k => {
+  const by = addDays(cookDay, k.days);
+  const gone = iso(by) < todayISO;
+  return `<div class="frz${gone ? ' zero' : ''}">
+    <span class="n">${esc(k.what)}</span>
+    <span class="age">${k.days >= 30 ? 'keeps a month' : 'eat by ' + esc(fmtDay(by))}</span>
+  </div>`;
+}).join('');
+
+$('#bank').innerHTML = (w.freezer || []).map(f =>
+  `<div class="frz"><span class="n">${esc(f.what)}</span><span class="age">${f.months} month${f.months === 1 ? '' : 's'}</span></div>`
+).join('');
 
 $('#days').innerHTML = w.days.map((d, i) => {
   const date = addDays(mon, i);
@@ -55,6 +78,7 @@ $('#days').innerHTML = w.days.map((d, i) => {
   const isBday = bday && iso(date) === iso(bday);
   const m1r = d.m1r ? recipeChip(d.m1r) : '';
   const m2r = d.m2r ? recipeChip(d.m2r) : '';
+  const also = (d.also || []).filter(id => RECIPES[id]);
   return `
   <div class="day${isToday ? ' today' : ''}" ${isToday ? 'id="today"' : ''}>
     <div class="dh">
@@ -63,13 +87,15 @@ $('#days').innerHTML = w.days.map((d, i) => {
       <span class="spacer"></span>
       ${isToday ? '<span class="pill today">Today</span>' : ''}
       ${isBday ? '<span class="pill free">Birthday</span>' : ''}
+      ${d.free ? '<span class="pill free">Free meal</span>' : ''}
       <span class="pill ${d.lift ? 'lift' : 'rest'}">${d.lift ? 'Tonal' : 'No lift'}</span>
     </div>
     <div class="meal"><span class="when">${CONFIG.window.start}</span><span class="what">${esc(d.m1)}${m1r}</span></div>
     <div class="meal"><span class="when">Dinner</span><span class="what">${esc(d.m2)}${m2r}</span></div>
+    ${also.length ? `<div class="alsoline">Also: ${also.map(id => `<a href="recipes.html#${id}">${esc(RECIPES[id].name)}</a>`).join(', ')}</div>` : ''}
     ${d.post ? `<div class="postnote">${esc(d.post)}</div>` : ''}
     ${d.kid ? `<div class="kidline"><b>Son:</b> ${esc(d.kid)}</div>` : ''}
-    ${isBday ? `<div class="postnote"><b>Turning 41.</b> Go to Korean BBQ and order galbi, chadolbaegi and a mountain of lettuce. Skip the rice, the naengmyeon and the soju. You can have a real celebration meal that costs the reset nothing, and doing it that way is the difference between a birthday and a relapse.</div>` : ''}
+    ${isBday ? `<div class="postnote"><b>Turning 41.</b> Make this the free meal for the week and go wherever you actually want. If it is Korean BBQ, order galbi and chadolbaegi and a mountain of lettuce and skip the rice and the soju, and you will have had a real celebration that costs the reset nothing. If it is something else, have that instead. One planned meal is not a relapse, it is the thing that keeps the other eighty-three on track.</div>` : ''}
     ${d.note ? `<div class="daynote">${esc(d.note)}</div>` : ''}
   </div>`;
 }).join('');

@@ -357,3 +357,43 @@ footer.foot p { max-width: 70ch; }
   .check input { -webkit-appearance: none; appearance: none; border: 1px solid #000; border-radius: 2px; }
   .grid.two { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------- cuisine + storage bits ---------- */
+
+.cuis {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: .2rem .45rem;
+  border-radius: 5px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  white-space: nowrap;
+}
+h1 .cuis { font-size: .6rem; position: relative; top: -.2rem; }
+
+.brand .tag { color: var(--ink-3); font-size: .78rem; }
+
+.flag.keeps { background: var(--bg); border: 1px solid var(--line); }
+.flag.keeps b { color: var(--ink-2); }
+.flag.keeps a { color: var(--accent); }
+
+.frz .age {
+  display: block;
+  font-size: .76rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  margin-top: .1rem;
+}
+.frz > .age { display: inline-block; margin: 0; text-align: right; }
+.frz.soon .age { color: var(--gold); font-weight: 600; }
+.frz.old .age { color: var(--accent); font-weight: 600; }
+
+table.log td.nw { font-variant-numeric: normal; color: var(--ink-2); font-size: .85rem; }
+
+.alsoline { margin-top: .5rem; font-size: .8rem; color: var(--ink-3); }
+.alsoline a { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+table.log td:nth-child(2), table.log td:nth-child(3) { white-space: nowrap; }

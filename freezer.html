@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Freezer - Reset Kitchen</title>
-<meta name="description" content="What is actually in the freezer, so you never have to guess.">
+<title>Storage - Reset Kitchen</title>
+<meta name="description" content="What is in the freezer, how old it is, and how long everything keeps.">
 <meta name="theme-color" content="#b8402b">
 <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -14,76 +14,155 @@
 <script src="assets/app.js"></script>
 <script>
 renderChrome('freezer.html');
-// Master list: every freezable thing the cycle produces, deduped.
-const MASTER = [...new Set(WEEKS.flatMap(w => w.freezer))]
-  .filter(x => !/^Whatever/.test(x));
+
+/* Every freezable thing the cycle produces, deduped, with its shelf life. */
+const MASTER = [];
+WEEKS.forEach(w => (w.freezer || []).forEach(f => {
+  if (!MASTER.some(m => m.what === f.what)) MASTER.push(f);
+}));
+
+const w = weekData();
+const cookDay = addDays(mondayForCycleWeek(w.n), -1);
+const todayISO = iso(today());
 
 $('#main').innerHTML = `
-  <h1>Freezer</h1>
-  <p class="lede">The freezer is the whole plan. When it has food in it, a bad Wednesday costs you fifteen minutes instead of eighty dollars. Tap the plus when you put something in, the minus when you take it out.</p>
+  <h1>Storage</h1>
+  <p class="lede">The freezer is the whole plan. When it has food in it, a bad Wednesday costs you fifteen minutes instead of eighty dollars. The dates are what keep it a bank rather than a graveyard: tap the plus when a bag goes in, the minus when one comes out, and the oldest bag is always the one it counts as leaving.</p>
+
+  <h2>In the fridge right now</h2>
+  <div id="wb"></div>
+  <div class="card">
+    <p class="muted" style="margin:0 0 .6rem">Week ${w.n}, cooked Sunday ${esc(fmtShort(cookDay))}. Anything already past its date is greyed out.</p>
+    <div id="keeps"></div>
+    <div class="flag reset" style="margin-top:.9rem"><b>The rule:</b> ${esc(KEEPS.headline)}</div>
+  </div>
+
+  <h2>In the freezer</h2>
   <div class="tools">
     <button id="add">Add your own item</button>
-    <button id="zero">Set everything to zero</button>
+    <button id="zero">Empty the whole list</button>
   </div>
   <div class="card" id="inv"></div>
   <div class="card">
     <div class="stat" id="stats"></div>
   </div>
-  <h2>Freezing, done right</h2>
+
+  <h2>How long things keep</h2>
+  <p class="muted">${esc(KEEPS.intro)}</p>
   <div class="card">
-    <div class="qa"><b>Flat bags, always.</b><p>A quart bag frozen flat thaws in a bowl of water in twenty minutes and stacks like a file folder. The same bag frozen in a lump takes two hours and lives at the back forever.</p></div>
-    <div class="qa"><b>Chill it cold before it goes in.</b><p>Warm food forms big ice crystals that shred texture on the way back out, and it partially thaws its neighbors. Ice bath, or spread it on a sheet pan first.</p></div>
-    <div class="qa"><b>Raw in marinade beats cooked, for beef and pork.</b><p>Bulgogi, LA galbi and jeyuk bokkeum all go in raw. The marinade keeps working while it thaws, so the bag you pull in week three is better than the one you sealed. Cooked steak is the exception, because sous vide plus ice bath plus seal is already perfect.</p></div>
-    <div class="qa"><b>Soups and stews freeze best of everything.</b><p>Yukgaejang, galbijjim, kimchi jjigae and every guk in the plan come back indistinguishable. Add tofu after thawing, never before, or it turns spongy.</p></div>
-    <div class="qa"><b>Write on the bag.</b><p>Dish and date, in marker, before it goes in. Nobody has ever correctly identified a frozen brown block by looking at it.</p></div>
+    <table class="log">
+      <thead><tr><th>Food</th><th>Fridge</th><th>Freezer</th><th>Notes</th></tr></thead>
+      <tbody>${KEEPS.table.map(k => `<tr>
+        <td><b>${esc(k.food)}</b></td>
+        <td>${esc(k.fridge)}</td>
+        <td>${esc(k.freezer)}</td>
+        <td class="nw">${esc(k.note)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>
+
+  <h2>Thawing, without poisoning anyone</h2>
+  <div class="card">
+    <ul style="margin:0;padding-left:1.2rem">${KEEPS.thaw.map(t => `<li style="margin:.4rem 0">${esc(t)}</li>`).join('')}</ul>
+  </div>
+
+  <h2>When to throw it out</h2>
+  <div class="card">
+    <ul style="margin:0;padding-left:1.2rem">${KEEPS.toss.map(t => `<li style="margin:.4rem 0">${esc(t)}</li>`).join('')}</ul>
   </div>
 `;
 
+weekBar('#wb');
+
+$('#keeps').innerHTML = (w.keeps || []).map(k => {
+  const by = addDays(cookDay, k.days);
+  const gone = iso(by) < todayISO;
+  return `<div class="frz${gone ? ' zero' : ''}">
+    <span class="n">${esc(k.what)}</span>
+    <span class="age">${k.days >= 30 ? 'keeps a month' : (gone ? 'was due ' : 'eat by ') + esc(fmtDay(by))}</span>
+  </div>`;
+}).join('');
+
+/* ---------- inventory: one dated entry per bag ---------- */
+
+function inv() { return store.get('fzr', {}); }
+function saveInv(v) { store.set('fzr', v); }
+function monthsFor(item) {
+  const m = MASTER.find(x => x.what === item);
+  return m ? m.months : (store.get('fzrCustom', {})[item] || 3);
+}
+
 function draw() {
-  const inv = store.get('freezer', {});
-  const custom = store.get('freezerCustom', []);
-  const all = [...MASTER, ...custom];
-  $('#inv').innerHTML = all.map((item, i) => {
-    const n = inv[item] || 0;
-    return `<div class="frz${n === 0 ? ' zero' : ''}">
-      <span class="n">${esc(item)}</span>
-      <button data-d="-1" data-item="${esc(item)}">&minus;</button>
+  const v = inv();
+  const custom = Object.keys(store.get('fzrCustom', {}));
+  const names = [...MASTER.map(m => m.what), ...custom.filter(c => !MASTER.some(m => m.what === c))];
+
+  $('#inv').innerHTML = names.map(item => {
+    const bags = (v[item] || []).slice().sort();
+    const n = bags.length;
+    const months = monthsFor(item);
+    let age = `keeps ${months} month${months === 1 ? '' : 's'}`;
+    let cls = '';
+    if (n) {
+      const oldest = parseISO(bags[0]);
+      const use = addDays(oldest, months * 30);
+      const left = daysBetween(today(), use);
+      age = left < 0 ? `oldest bag is past its date` : left < 21 ? `use the oldest by ${fmtShort(use)}` : `oldest bag good to ${fmtShort(use)}`;
+      cls = left < 0 ? ' old' : left < 21 ? ' soon' : '';
+    }
+    return `<div class="frz${n === 0 ? ' zero' : ''}${cls}">
+      <span class="n">${esc(item)}<span class="age">${esc(age)}</span></span>
+      <button data-d="-1" data-item="${esc(item)}" aria-label="Take one out">&minus;</button>
       <span class="qty">${n}</span>
-      <button data-d="1" data-item="${esc(item)}">+</button>
+      <button data-d="1" data-item="${esc(item)}" aria-label="Put one in">+</button>
     </div>`;
   }).join('');
 
-  const total = Object.values(inv).reduce((a, b) => a + b, 0);
-  const stocked = Object.values(inv).filter(v => v > 0).length;
-  const meals = Object.entries(inv).filter(([, v]) => v > 0).length;
+  const total = names.reduce((a, item) => a + (v[item] || []).length, 0);
+  const kinds = names.filter(item => (v[item] || []).length > 0).length;
+  const late = names.filter(item => {
+    const bags = (v[item] || []).slice().sort();
+    if (!bags.length) return false;
+    return daysBetween(today(), addDays(parseISO(bags[0]), monthsFor(item) * 30)) < 0;
+  }).length;
+
   $('#stats').innerHTML = `
-    <div><b>${total}</b><span>Items banked</span></div>
-    <div><b>${stocked}</b><span>Kinds in stock</span></div>
-    <div><b>${meals >= 4 ? 'Good' : meals >= 2 ? 'Thin' : 'Empty'}</b><span>State of things</span></div>`;
+    <div><b>${total}</b><span>Bags banked</span></div>
+    <div><b>${kinds}</b><span>Kinds in stock</span></div>
+    <div><b>${late}</b><span>Past their date</span></div>
+    <div><b>${total >= 8 ? 'Deep' : total >= 4 ? 'Good' : total >= 1 ? 'Thin' : 'Empty'}</b><span>State of things</span></div>`;
 
   $('#inv').querySelectorAll('button').forEach(b => {
     b.onclick = () => {
-      const i2 = store.get('freezer', {});
+      const v2 = inv();
       const item = b.dataset.item;
-      i2[item] = Math.max(0, (i2[item] || 0) + (+b.dataset.d));
-      store.set('freezer', i2);
+      const bags = (v2[item] || []).slice().sort();
+      if (+b.dataset.d === 1) bags.push(todayISO);
+      else bags.shift(); // oldest out first, which is the right habit
+      v2[item] = bags;
+      saveInv(v2);
       draw();
     };
   });
 }
 
 $('#add').onclick = () => {
-  const v = prompt('What went into the freezer?');
-  if (!v) return;
-  const c = store.get('freezerCustom', []);
-  if (!c.includes(v)) c.push(v);
-  store.set('freezerCustom', c);
-  const inv = store.get('freezer', {});
-  inv[v] = (inv[v] || 0) + 1;
-  store.set('freezer', inv);
+  const name = prompt('What went into the freezer?');
+  if (!name) return;
+  const months = +(prompt('How many months does it keep? See the table below if you are not sure.', '3') || 3);
+  const c = store.get('fzrCustom', {});
+  c[name] = months > 0 ? months : 3;
+  store.set('fzrCustom', c);
+  const v = inv();
+  v[name] = [...(v[name] || []), todayISO];
+  saveInv(v);
   draw();
 };
-$('#zero').onclick = () => { if (confirm('Set every count to zero?')) { store.set('freezer', {}); draw(); } };
+
+$('#zero').onclick = () => {
+  if (confirm('Clear every bag from the list?')) { saveInv({}); draw(); }
+};
+
 draw();
 </script>
 </body>

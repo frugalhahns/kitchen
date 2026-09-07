@@ -11,7 +11,7 @@ const PAGES = [
   { file: 'train.html', label: 'Training' },
   { file: 'plan.html', label: 'The Plan' },
   { file: 'eatout.html', label: 'Eating Out' },
-  { file: 'freezer.html', label: 'Freezer' },
+  { file: 'freezer.html', label: 'Storage' },
   { file: 'track.html', label: 'Progress' },
 ];
 
@@ -32,6 +32,9 @@ function addDays(dt, n) { const d = new Date(dt); d.setDate(d.getDate() + n); re
 function iso(dt) { return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0'); }
 function fmtShort(dt) { return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
 function today() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+
+function fmtDay(dt) { return dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }); }
+function daysBetween(a, b) { return Math.round((b - a) / 864e5); }
 
 /* Monday of the week containing dt */
 function mondayOf(dt) {
@@ -71,6 +74,10 @@ function mondayForCycleWeek(cw) {
   return parseISO(CONFIG.cycleStart);
 }
 
+/* The Saturday market day and Sunday cook day that feed a given cycle week. */
+function cookDayForCycleWeek(cw) { return addDays(mondayForCycleWeek(cw), -1); }
+function marketDayForCycleWeek(cw) { return addDays(mondayForCycleWeek(cw), -2); }
+
 /* ---------- selected week (persists across pages) ---------- */
 
 function selectedWeek() {
@@ -97,7 +104,7 @@ function renderChrome(active) {
     <header class="top">
       <div class="brand">
         <a href="index.html">Reset Kitchen</a>
-        <span class="ko">리셋 부엌</span>
+        <span class="tag">cook once, eat all week</span>
         <span class="spacer"></span>
         <span class="phase">${esc(phase)}</span>
       </div>
@@ -109,7 +116,7 @@ function renderChrome(active) {
   document.body.insertAdjacentHTML('beforeend', `
     <footer class="foot">
       <p><b>Not medical advice.</b> This is a meal plan and a training schedule, written for one specific person who has done this before and had the labs to show it worked. Anyone with a diabetes or cholesterol history, and especially anyone on medication for either, should talk to their doctor before cutting carbohydrates this sharply. Glucose-lowering medication plus a sudden carb drop is the one genuinely risky combination here.</p>
-      <p>Recipe links go to Korean Bapsang and other outside sites and were checked when this was built. Everything else on this site is stored only in this browser, nothing is uploaded anywhere.</p>
+      <p>Most recipes here are written out in full and need no outside link. Where one is given it goes to Korean Bapsang and was checked when this was built. Everything else on this site is stored only in this browser, nothing is uploaded anywhere.</p>
     </footer>`);
 }
 
@@ -142,14 +149,25 @@ function recipeChip(id) {
   return ` <a href="recipes.html#${id}">recipe</a>`;
 }
 
+function keepsText(r) {
+  if (!r.keep) return '';
+  const f = r.keep.fridge, z = r.keep.freezer;
+  const fridge = !f ? 'Eat it now' : f >= 30 ? 'Fridge a month' : 'Fridge ' + f + ' day' + (f === 1 ? '' : 's');
+  const frz = !z ? 'do not freeze' : 'freezer ' + z + ' month' + (z === 1 ? '' : 's');
+  return fridge + ', ' + frz + '.';
+}
+
 function renderRecipeBody(id, r) {
   return `
     <div class="rbody">
       <div class="flag reset"><b>Reset version:</b> ${esc(r.reset)}</div>
+      ${r.keep ? `<div class="flag keeps"><b>Keeps:</b> ${esc(keepsText(r))} <a href="freezer.html">Storage rules</a></div>` : ''}
       <h4>Ingredients</h4>
       <ul>${r.ing.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
       <h4>Method</h4>
       <ol>${r.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+      ${r.variants ? `<h4>Same method, different week</h4>
+      <ul>${r.variants.map((v) => `<li><b>${esc(v.for)}:</b> ${esc(v.use)}</li>`).join('')}</ul>` : ''}
       <div class="flag freeze"><b>Freezer:</b> ${esc(r.freeze)}</div>
       ${r.kid && r.kid !== 'n/a' ? `<div class="flag kid"><b>For the 8-year-old:</b> ${esc(r.kid)}</div>` : ''}
       ${r.note ? `<p class="muted">${esc(r.note)}</p>` : ''}

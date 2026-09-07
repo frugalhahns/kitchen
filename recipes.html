@@ -15,14 +15,15 @@
 <script>
 renderChrome('recipes.html');
 const CATS = [
-  ['all', 'Everything'], ['beef', 'Beef'], ['chicken', 'Chicken'], ['pork', 'Pork'],
-  ['fish', 'Fish'], ['egg', 'Eggs'], ['banchan', 'Banchan'], ['base', 'Bases'],
+  ['all', 'Everything'], ['korean', 'Korean'], ['mexican', 'Mexican'],
+  ['mideast', 'Middle Eastern'], ['spanish', 'Spanish'], ['american', 'American'],
+  ['extras', 'Every week'],
 ];
 
 $('#main').innerHTML = `
   <h1>Recipes</h1>
-  <p class="lede">Every dish in the four-week rotation. Each one lists what to change to keep it free of sugar and grain, because almost no Korean recipe you find online is written that way. Outside links go to the full original.</p>
-  <input class="rsearch" id="q" type="search" placeholder="Search by name, ingredient or Korean" autocomplete="off">
+  <p class="lede">Every dish in the four-week rotation. Nothing here runs past eight ingredients or four steps, every one says how long it keeps in the fridge and the freezer, and each one lists what to change to keep it free of sugar and grain. The Every week group is the handful of things that carry all four cuisines.</p>
+  <input class="rsearch" id="q" type="search" placeholder="Search by name, ingredient or cuisine" autocomplete="off">
   <div class="cats" id="cats">${CATS.map(([k, l], i) => `<button data-c="${k}" class="${i === 0 ? 'on' : ''}">${esc(l)}</button>`).join('')}</div>
   <div id="list"></div>
   <p class="muted" id="count"></p>
@@ -33,7 +34,7 @@ let cat = 'all', q = '';
 function matches(id, r) {
   if (cat !== 'all' && r.cat !== cat) return false;
   if (!q) return true;
-  const hay = [r.name, r.ko, r.cat, r.reset, r.note, ...(r.ing || [])].join(' ').toLowerCase();
+  const hay = [r.name, r.sub, r.cat, r.reset, r.note, ...(r.ing || [])].join(' ').toLowerCase();
   return hay.includes(q);
 }
 
@@ -42,7 +43,7 @@ function draw() {
   $('#list').innerHTML = ids.map(id => {
     const r = RECIPES[id];
     return `<details class="recipe" id="${id}">
-      <summary><b>${esc(r.name)}</b>${r.ko ? `<span class="ko">${esc(r.ko)}</span>` : ''}<span class="meta">${esc(r.time)}</span></summary>
+      <summary><b>${esc(r.name)}</b>${r.sub ? `<span class="ko">${esc(r.sub)}</span>` : ''}<span class="meta">${esc(r.time)}</span></summary>
       ${renderRecipeBody(id, r)}
     </details>`;
   }).join('') || '<div class="card"><p class="muted">Nothing matches that.</p></div>';

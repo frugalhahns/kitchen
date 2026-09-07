@@ -18,7 +18,13 @@ $('#main').innerHTML = `
   <h1>Eating Out</h1>
   <p class="lede">${esc(EATOUT.intro)}</p>
 
-  <h2>First, the fifteen-minute meals</h2>
+  <h2>${esc(EATOUT.freeMeal.title)}</h2>
+  <div class="card">
+    ${EATOUT.freeMeal.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+    <p class="muted" style="margin-top:.8rem">The free meal is on the <a href="index.html">week view</a> every Saturday. Move it to whichever night the week actually needs, but move it rather than adding a second one.</p>
+  </div>
+
+  <h2>Then the fifteen-minute meals</h2>
   <p class="muted">Read this list before you open a delivery app. Every one of these is faster than delivery arrives.</p>
   <div class="card">
     ${EATOUT.fifteenMin.map(m => `<div class="qa"><b>${esc(m.meal)}</b><p>${esc(m.how)}</p></div>`).join('')}
@@ -33,10 +39,11 @@ $('#main').innerHTML = `
     </div>`).join('')}
   </div>
 
-  <h2>The two traps</h2>
+  <h2>The three traps, in every cuisine</h2>
   <div class="card">
-    <div class="qa"><b>Marinade is sugar.</b><p>Anything described as marinated, glazed, teriyaki, sweet and spicy, or bulgogi-style at a restaurant is carrying corn syrup. Unmarinated cuts, salt-grilled fish and clear soups are the safe half of every Korean menu.</p></div>
-    <div class="qa"><b>The banchan are not all free.</b><p>Most of them are vegetables and they are the best part of eating Korean on a reset. But myeolchi bokkeum, candied lotus root, potato salad, corn cheese and japchae are sugar and starch. Eat the kimchi, the namul, the sprouts and the cucumber, and leave the shiny ones.</p></div>
+    <div class="qa"><b>The sauce is where the sugar is.</b><p>Glazed, teriyaki, sweet and spicy, barbecue, honey anything, balsamic reduction, al pastor at a bad taqueria. Grilled and salted is the safe half of every menu on earth. Ask for it plain and put the free sauces on it: salsa, tahini, chimichurri, mustard, olive oil and lemon.</p></div>
+    <div class="qa"><b>It is the sides, not the main.</b><p>Nobody gets derailed by the steak or the kebab. It is the rice, the pita, the chips, the tortillas and the bread basket, all of which arrive without being ordered. Ask for double salad or double vegetables in their place and every one of these restaurants will do it without blinking.</p></div>
+    <div class="qa"><b>The drink is a dessert.</b><p>Soda, sangria, margaritas, sweet tea and most cocktails carry more sugar than the food does, and alcohol is what quietly ends the decision-making that got you through the rest of the meal. Sparkling water, or attach the drink to the free meal and nothing else.</p></div>
   </div>
 `;
 </script>
