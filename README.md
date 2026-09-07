@@ -56,6 +56,17 @@ That is a fat-loss plan, not the recomposition it claimed. The fix is a protein 
 fasting hours are doing real work on fasting glucose. Each week has its own version built
 around whichever sauce jar is already open, and the Fuel page carries the arithmetic.
 
+## Fiber, and the legumes that were missing
+
+The first version of this plan did not mention fiber once, and told you to skip the beans
+at a taqueria. That was the biggest hole in it. Vegetables alone get to about 17g a day
+against a 30 to 40g target; one cup of lentils or black beans closes the rest in a single
+move, and viscous fiber is the one lever that works on LDL and on glucose at the same
+time. Legumes are not grains and were never excluded by the protocol that worked in 2023,
+they got swept out by low-carb habit. Lentil and chicken soup is now the highest-value
+recipe on the site: 30g of protein and 12g of fiber a bowl, and it freezes for four
+months.
+
 ## The protein mix
 
 Every week is built to two fish nights, two chicken nights and two red meat nights, with

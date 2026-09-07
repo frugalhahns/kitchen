@@ -43,6 +43,21 @@ $('#main').innerHTML = `
     <div id="out"></div>
   </div>
 
+  <h2>${esc(FUEL.fiber.title)}</h2>
+  <p class="muted">${esc(FUEL.fiber.body)}</p>
+  <div class="card">
+    ${FUEL.fiber.points.map(x => `<div class="qa"><b>${esc(x.p)}</b><p>${esc(x.d)}</p></div>`).join('')}
+  </div>
+  <div class="card">
+    <table class="log">
+      <thead><tr><th>Food</th><th>Fiber</th><th>Notes</th></tr></thead>
+      <tbody>${FUEL.fiber.sources.map(f2 => `<tr>
+        <td><b>${esc(f2.food)}</b></td><td>${esc(f2.fiber)}</td><td class="nw">${esc(f2.note)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <p class="muted" style="margin:.8rem 0 0">A day that hits it: three cups of roasted vegetables, half an avocado, kimchi, and one cup of lentils or beans. That is 34g without trying, and the lentil soup does most of it in one bowl.</p>
+  </div>
+
   <h2>${esc(FUEL.waist.title)}</h2>
   <p class="muted">${esc(FUEL.waist.body)}</p>
   <div class="card">
@@ -54,9 +69,9 @@ $('#main').innerHTML = `
   <p class="muted">${esc(FUEL.day.body)}</p>
   <div class="card">
     <table class="log">
-      <thead><tr><th>When</th><th>Protein</th><th>Calories</th><th>What</th></tr></thead>
+      <thead><tr><th>When</th><th>Protein</th><th>Fiber</th><th>Calories</th><th>What</th></tr></thead>
       <tbody>${FUEL.day.rows.map((r, i) => `<tr${i === FUEL.day.rows.length - 1 ? ' class="tot"' : ''}>
-        <td><b>${esc(r.when)}</b></td><td>${esc(r.protein)}</td><td>${esc(r.kcal)}</td><td class="nw">${esc(r.what)}</td>
+        <td><b>${esc(r.when)}</b></td><td>${esc(r.protein)}</td><td>${esc(r.fiber)}</td><td>${esc(r.kcal)}</td><td class="nw">${esc(r.what)}</td>
       </tr>`).join('')}</tbody>
     </table>
     <p class="muted" style="margin:.8rem 0 0">${esc(FUEL.day.note)}</p>
@@ -156,6 +171,7 @@ function calc() {
       <div><b>${target.toLocaleString()}</b><span>Calories a day</span></div>
       <div><b>${pro}g</b><span>Protein a day</span></div>
       <div><b>${perWeek.toFixed(1)} lb</b><span>Fat loss a week</span></div>
+      <div><b>${CONFIG.fiberTarget}g</b><span>Fiber a day</span></div>
       <div><b>${waistTarget}"</b><span>Waist target</span></div>
     </div>
     <div class="flag reset" style="margin-top:.9rem">
@@ -171,6 +187,7 @@ function calc() {
         <tr><td><b>Daily burn</b></td><td>${tdee.toLocaleString()}</td><td class="nw">Resting rate times ${ac}, for four lifts a week plus the walking.</td></tr>
         <tr><td><b>Eat</b></td><td>${target.toLocaleString()}</td><td class="nw">A ${(tdee - target).toLocaleString()} deficit, ${Math.round((tdee - target) / tdee * 100)} percent below burn and no more than 1 percent of bodyweight a week. Modest on purpose, so the lifting still builds something.</td></tr>
         <tr><td><b>Protein</b></td><td>${proLo} to ${pro}g</td><td class="nw">About 1g per lb of ${gw && gw < wt ? 'goal' : 'estimated lean'} bodyweight, which is ${basis} lb. Non-negotiable, and the number this plan was failing to hit.</td></tr>
+        <tr><td><b>Fiber</b></td><td>${CONFIG.fiberTarget}g</td><td class="nw">30 to 40g. A cup of lentils or beans a day plus the vegetables gets you there, and it is the one number that helps the cholesterol and the blood sugar at the same time.</td></tr>
         <tr><td><b>Fat, minimum</b></td><td>${fatMin}g</td><td class="nw">Floor for hormones. You will land well above it on this food, which is fine.</td></tr>
         <tr><td><b>Everything else</b></td><td>${restKcal > 0 ? restKcal.toLocaleString() + ' kcal' : 'covered'}</td><td class="nw">More fat, more protein, and 40 to 80g of carbohydrate from ten pounds of vegetables a week.</td></tr>
         ${toGoal ? `<tr><td><b>Time to ${gw} lb</b></td><td>${toGoal} weeks</td><td class="nw">At this rate, if nothing stalls. It always stalls somewhere, so add a month.</td></tr>` : ''}
