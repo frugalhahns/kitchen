@@ -83,6 +83,20 @@ all of it. The two honest caveats are on the Fuel page: a bowl is often 25 to 30
 protein rather than 50, so pair it, and potato, dairy, rice and noodles do not survive
 the freezer, so add those to the bowl instead of the pot.
 
+## Stews are how the cholesterol side gets fixed
+
+An audit found 2 stew dinners out of 20, after the README claimed stews were the
+backbone. That gap was also why the saturated fat load stayed high: a stew is the
+mechanism for cutting it without losing the meal. Eight ounces of beef across six bowls
+of doenjang jjigae is a fraction of an eight ounce steak and the bowl still eats like
+dinner. Now 5 of 20, with two new recipes chosen for exactly that: `doenjang-jjigae`
+(tofu and vegetables carry it, meat is seasoning) and `turkey-bean-chili` (the best
+protein, fiber and low-saturated-fat combination on the site). The chili also drops
+Week 2 from two pork dinners to one.
+
+The Fuel page carries an honest scorecard: strong for blood sugar, decent and improving
+for cholesterol, with the things still working against it named rather than hidden.
+
 ## Every day gets its own afternoon meal
 
 The `snack` field started life on the week rather than the day, which meant the same line

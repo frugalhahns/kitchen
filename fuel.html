@@ -45,6 +45,22 @@ $('#main').innerHTML = `
     <div id="out"></div>
   </div>
 
+  <h2>${esc(FUEL.scorecard.title)}</h2>
+  <p class="muted">${esc(FUEL.scorecard.body)}</p>
+  <div class="grid two">
+    <div class="card">
+      <h3 style="margin-top:0">Blood sugar <span class="cuis">${esc(FUEL.scorecard.glucose.grade)}</span></h3>
+      <p class="muted">${esc(FUEL.scorecard.glucose.why)}</p>
+      <ul style="margin:0;padding-left:1.2rem">${FUEL.scorecard.glucose.points.map(x => `<li style="margin:.4rem 0">${esc(x)}</li>`).join('')}</ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Cholesterol <span class="cuis">${esc(FUEL.scorecard.cholesterol.grade)}</span></h3>
+      <p class="muted">${esc(FUEL.scorecard.cholesterol.why)}</p>
+      <ul style="margin:0;padding-left:1.2rem">${FUEL.scorecard.cholesterol.points.map(x => `<li style="margin:.4rem 0">${esc(x)}</li>`).join('')}</ul>
+    </div>
+  </div>
+  <div class="card"><div class="flag reset" style="margin:0"><b>The verdict:</b> ${esc(FUEL.scorecard.verdict)}</div></div>
+
   <h2>${esc(FUEL.fiber.title)}</h2>
   <p class="muted">${esc(FUEL.fiber.body)}</p>
   <div class="card">
