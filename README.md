@@ -129,6 +129,33 @@ anchors rather than staples, the big soup has a chicken version, and the plan sa
 explicitly what to change if the week 12 ApoB comes back up. See "The protein mix, with
 your labs in mind" on the Plan page.
 
+## The interface
+
+One type scale, one spacing scale, and hairlines doing the separating instead of a
+shadow on every card. The specifics worth knowing:
+
+- **A day is three meals and nothing else.** Everything that used to stack under them
+  (post-lift note, kid line, day note, related recipes) collapses behind one quiet
+  `n notes` toggle, open by default only on today. Cards went from seven stacked blocks
+  to three lines.
+- **Protein tags** (`FISH`, `BEEF`, `PLANT`) are derived from the meal text at render
+  time by `proteinTag()`, never stored, so a tag cannot drift out of sync with the food.
+  They make the week's variety scannable, and they immediately exposed a logic bug:
+  Wednesday lunch was "cold salmon" on a day the salmon is not cooked until dinner.
+- **Three-column week** on wide screens, two on tablet, one on phone. Today gets an
+  accent ring; past days recede; the free meal Saturday gets a gold wash.
+- **Nav is grouped** into the week, the reasoning, and the record. Long pages get a
+  jump nav so they stop being a wall.
+- **Charts follow the dataviz spec:** two single-series small multiples rather than a
+  dual axis, 2px lines, r=4 markers with a 2px surface ring, a solid hairline target
+  rule (dashed reads as "projection"), endpoint-only direct labels, and a hover
+  tooltip. The series palette is validated by script in both modes, not eyeballed:
+  `#b8402b`/`#4a72b0` light and `#d96248`/`#5f8fd0` dark, all six checks passing with
+  worst-adjacent CVD dE 20. The original terracotta-and-green pair failed at dE 4.9.
+- Prose is capped near 72ch, big stat values use proportional figures (tabular
+  loosens large numerals), and there are print styles because the shopping list is
+  the page people print.
+
 ## Editing it
 
 No build step, no dependencies, no framework. Everything the site displays lives in

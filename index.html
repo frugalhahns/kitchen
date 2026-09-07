@@ -45,7 +45,7 @@ $('#main').innerHTML = `
     <a class="btn" href="shopping.html">Shopping list</a>
     <a class="btn" href="recipes.html">All recipes</a>
   </div>
-  <div class="grid" id="days"></div>
+  <div class="grid days" id="days"></div>
 
   <h2>In the fridge, and by when</h2>
   <div class="card">
@@ -79,12 +79,25 @@ $('#bank').innerHTML = (w.freezer || []).map(f =>
 $('#days').innerHTML = w.days.map((d, i) => {
   const date = addDays(mon, i);
   const isToday = iso(date) === todayISO;
+  const isPast = iso(date) < todayISO && st.started && !st.done;
   const isBday = bday && iso(date) === iso(bday);
   const m1r = d.m1r ? recipeChip(d.m1r) : '';
   const m2r = d.m2r ? recipeChip(d.m2r) : '';
   const also = (d.also || []).filter(id => RECIPES[id]);
+  const snack = d.snack || w.snack;
+  const bdayNote = isBday
+    ? '<b>Turning 41.</b> Make this the free meal for the week and go wherever you actually want. If it is Korean BBQ, order galbi and chadolbaegi and a mountain of lettuce and skip the rice and the soju, and you will have had a real celebration that costs the reset nothing. One planned meal is not a relapse, it is the thing that keeps the other eighty-three on track.'
+    : '';
+  const extras = [
+    d.post ? `<p class="note-p"><b>After the Tonal.</b> ${esc(d.post)}</p>` : '',
+    bdayNote ? `<p class="note-p">${bdayNote}</p>` : '',
+    d.kid ? `<p class="note-k"><b>Son:</b> ${esc(d.kid)}</p>` : '',
+    d.note ? `<p class="note-n">${esc(d.note)}</p>` : '',
+    also.length ? `<p class="alsoline">Also: ${also.map(id => `<a href="recipes.html#${id}">${esc(RECIPES[id].name)}</a>`).join(', ')}</p>` : '',
+  ].filter(Boolean);
+
   return `
-  <div class="day${isToday ? ' today' : ''}" ${isToday ? 'id="today"' : ''}>
+  <div class="day${isToday ? ' today' : ''}${d.free ? ' free' : ''}${isPast ? ' past' : ''}" ${isToday ? 'id="today"' : ''}>
     <div class="dh">
       <b>${esc(d.day)}</b>
       <span class="date">${esc(fmtShort(date))}</span>
@@ -92,16 +105,12 @@ $('#days').innerHTML = w.days.map((d, i) => {
       ${isToday ? '<span class="pill today">Today</span>' : ''}
       ${isBday ? '<span class="pill free">Birthday</span>' : ''}
       ${d.free ? '<span class="pill free">Free meal</span>' : ''}
-      <span class="pill ${d.lift ? 'lift' : 'rest'}">${d.lift ? 'Tonal' : 'No lift'}</span>
+      <span class="pill ${d.lift ? 'lift' : 'rest'}">${d.lift ? 'Tonal' : 'Rest'}</span>
     </div>
-    <div class="meal"><span class="when">${esc(win.first)}</span><span class="what">${esc(d.m1)}${m1r}</span></div>
-    ${(d.snack || w.snack) ? `<div class="meal"><span class="when">${esc(win.snack)}</span><span class="what">${esc(d.snack || w.snack)} <a href="fuel.html">why</a></span></div>` : ''}
-    <div class="meal"><span class="when">${esc(win.dinner)}</span><span class="what">${esc(d.m2)}${m2r}</span></div>
-    ${also.length ? `<div class="alsoline">Also: ${also.map(id => `<a href="recipes.html#${id}">${esc(RECIPES[id].name)}</a>`).join(', ')}</div>` : ''}
-    ${d.post ? `<div class="postnote">${esc(d.post)}</div>` : ''}
-    ${d.kid ? `<div class="kidline"><b>Son:</b> ${esc(d.kid)}</div>` : ''}
-    ${isBday ? `<div class="postnote"><b>Turning 41.</b> Make this the free meal for the week and go wherever you actually want. If it is Korean BBQ, order galbi and chadolbaegi and a mountain of lettuce and skip the rice and the soju, and you will have had a real celebration that costs the reset nothing. If it is something else, have that instead. One planned meal is not a relapse, it is the thing that keeps the other eighty-three on track.</div>` : ''}
-    ${d.note ? `<div class="daynote">${esc(d.note)}</div>` : ''}
+    <div class="meal"><span class="when">${esc(win.first)}</span><span class="what">${proteinTag(d.m1)}${esc(d.m1)}${m1r}</span></div>
+    ${snack ? `<div class="meal"><span class="when">${esc(win.snack)}</span><span class="what">${proteinTag(snack)}${esc(snack)}</span></div>` : ''}
+    <div class="meal"><span class="when">${esc(win.dinner)}</span><span class="what">${proteinTag(d.m2)}${esc(d.m2)}${m2r}</span></div>
+    ${extras.length ? `<details class="extra"${isToday ? ' open' : ''}><summary>${extras.length} note${extras.length === 1 ? '' : 's'}</summary><div class="extra-body">${extras.join('')}</div></details>` : ''}
   </div>`;
 }).join('');
 

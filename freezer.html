@@ -28,8 +28,9 @@ const todayISO = iso(today());
 $('#main').innerHTML = `
   <h1>Storage</h1>
   <p class="lede">The freezer is the whole plan. When it has food in it, a bad Wednesday costs you fifteen minutes instead of eighty dollars. The dates are what keep it a bank rather than a graveyard: tap the plus when a bag goes in, the minus when one comes out, and the oldest bag is always the one it counts as leaving.</p>
+  <nav class="jump"><a href="#fridge">Fridge now</a><a href="#freezer">Freezer</a><a href="#bank">Full bank</a><a href="#keeps">How long</a><a href="#thaw">Thawing</a></nav>
 
-  <h2>In the fridge right now</h2>
+  <h2 id="fridge">In the fridge right now</h2>
   <div id="wb"></div>
   <div class="card">
     <p class="muted" style="margin:0 0 .6rem">Week ${w.n}, cooked Sunday ${esc(fmtShort(cookDay))}. Anything already past its date is greyed out.</p>
@@ -37,7 +38,7 @@ $('#main').innerHTML = `
     <div class="flag reset" style="margin-top:.9rem"><b>The rule:</b> ${esc(KEEPS.headline)}</div>
   </div>
 
-  <h2>In the freezer</h2>
+  <h2 id="freezer">In the freezer</h2>
   <div class="tools">
     <button id="add">Add your own item</button>
     <button id="zero">Empty the whole list</button>
@@ -47,7 +48,7 @@ $('#main').innerHTML = `
     <div class="stat" id="stats"></div>
   </div>
 
-  <h2>What a full bank looks like</h2>
+  <h2 id="bank">What a full bank looks like</h2>
   <p class="muted">${esc(BANK.intro)}</p>
   <div class="card">
     ${BANK.target.map(t => `<div class="qa"><b>${esc(t.what)} <span class="cuis">${esc(t.n)}</span></b><p>${esc(t.why)}</p></div>`).join('')}
@@ -56,7 +57,7 @@ $('#main').innerHTML = `
     <ul style="margin:0;padding-left:1.2rem">${BANK.rules.map(r => `<li style="margin:.4rem 0">${esc(r)}</li>`).join('')}</ul>
   </div>
 
-  <h2>How long things keep</h2>
+  <h2 id="keeps">How long things keep</h2>
   <p class="muted">${esc(KEEPS.intro)}</p>
   <div class="card">
     <table class="log">
@@ -70,12 +71,12 @@ $('#main').innerHTML = `
     </table>
   </div>
 
-  <h2>Thawing, without poisoning anyone</h2>
+  <h2 id="thaw">Thawing, without poisoning anyone</h2>
   <div class="card">
     <ul style="margin:0;padding-left:1.2rem">${KEEPS.thaw.map(t => `<li style="margin:.4rem 0">${esc(t)}</li>`).join('')}</ul>
   </div>
 
-  <h2>When to throw it out</h2>
+  <h2 id="toss">When to throw it out</h2>
   <div class="card">
     <ul style="margin:0;padding-left:1.2rem">${KEEPS.toss.map(t => `<li style="margin:.4rem 0">${esc(t)}</li>`).join('')}</ul>
   </div>

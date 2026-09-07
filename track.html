@@ -70,23 +70,59 @@ function delta(cur, prev, u) {
   return `<span style="color:${col}">${d > 0 ? '+' : ''}${d}${u || ''}</span>`;
 }
 
-function sparkline(pts, color, target) {
+/* Line: 2px round cap/join. Markers r>=4 with a 2px surface ring so they stay
+   legible where they overlap. Target rule is a solid hairline, not dashed:
+   dashing reads as "projection" when it is just a threshold. Hover gives a
+   crosshair and a tooltip, because an SVG chart is interactive by default. */
+function sparkline(pts, color, target, unit, label) {
   if (pts.length < 2) return '';
-  const w = 320, h = 60, pad = 4;
-  const xs = pts.map((p, i) => pad + i * (w - 2 * pad) / (pts.length - 1));
+  const w = 720, h = 140, padX = 8, padT = 18, padB = 24;
+  const xs = pts.map((p, i) => padX + i * (w - 2 * padX) / (pts.length - 1));
   const vals = pts.map(p => p.v).concat(target != null ? [target] : []);
   const min = Math.min(...vals), max = Math.max(...vals);
   const span = (max - min) || 1;
-  const y = (v) => h - pad - ((v - min) / span) * (h - 2 * pad);
+  const y = (v) => h - padB - ((v - min) / span) * (h - padT - padB);
   const ys = pts.map(p => y(p.v));
   const d = xs.map((x, i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + ys[i].toFixed(1)).join(' ');
-  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
-    ${target != null ? `<line x1="${pad}" y1="${y(target).toFixed(1)}" x2="${w - pad}" y2="${y(target).toFixed(1)}"
-      stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"/>
-      <text x="${w - pad}" y="${(y(target) - 4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--ink-3)">target ${target}</text>` : ''}
-    <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${xs.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2.5" fill="${color}"/>`).join('')}
-  </svg>`;
+  const last = pts.length - 1;
+  const pointData = pts.map((p, i) => `${xs[i].toFixed(1)},${ys[i].toFixed(1)},${p.v},${esc(p.d || '')}`).join(';');
+
+  return `<div class="chart" data-points="${pointData}" data-unit="${esc(unit || '')}">
+    <svg viewBox="0 0 ${w} ${h}" style="display:block;width:100%;height:auto;overflow:visible" role="img" aria-label="${esc(label || '')} over time">
+      ${target != null ? `<line x1="${padX}" y1="${y(target).toFixed(1)}" x2="${w - padX}" y2="${y(target).toFixed(1)}" stroke="var(--line-2)" stroke-width="1"/>
+        <text x="${padX}" y="${(y(target) + 14).toFixed(1)}" font-size="11" fill="var(--ink-3)">target ${target}${esc(unit || '')}</text>` : ''}
+      <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${xs.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4" fill="${color}" stroke="var(--card)" stroke-width="2"/>`).join('')}
+      <text x="${xs[last].toFixed(1)}" y="${(ys[last] - 11).toFixed(1)}" text-anchor="end" font-size="12" font-weight="600" fill="var(--ink-2)">${pts[last].v}${esc(unit || '')}</text>
+    </svg>
+    <div class="ttip"></div>
+  </div>`;
+}
+
+/* one hover handler for every chart on the page */
+function wireCharts(root) {
+  root.querySelectorAll('.chart').forEach(box => {
+    const svg = box.querySelector('svg');
+    const tip = box.querySelector('.ttip');
+    const unit = box.dataset.unit || '';
+    const pts = (box.dataset.points || '').split(';').filter(Boolean).map(s2 => {
+      const [x, y, v, dt] = s2.split(',');
+      return { x: +x, y: +y, v, d: dt };
+    });
+    if (!pts.length) return;
+    const move = (ev) => {
+      const r = svg.getBoundingClientRect();
+      const cx = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) / r.width * 720;
+      let best = pts[0];
+      pts.forEach(p => { if (Math.abs(p.x - cx) < Math.abs(best.x - cx)) best = p; });
+      tip.textContent = best.d ? `${best.d}  ${best.v}${unit}` : `${best.v}${unit}`;
+      tip.style.left = (best.x / 720 * r.width) + 'px';
+      tip.style.top = (best.y / 140 * r.height) + 'px';
+      tip.classList.add('on');
+    };
+    box.addEventListener('pointermove', move);
+    box.addEventListener('pointerleave', () => tip.classList.remove('on'));
+  });
 }
 
 function draw() {
@@ -113,26 +149,31 @@ function draw() {
         Waist is the one to trust. Set on the <a href="fuel.html">Fuel page</a>.</div></div>`
     : `<div class="card"><p class="muted" style="margin:0">Put your height in on the <a href="fuel.html">Fuel page</a> and this page will show your waist target next to what you measured. Nothing leaves the browser.</p></div>`;
 
-  const wts = log.filter(e => e.wt != null).map(e => ({ v: +e.wt }));
-  const wss = log.filter(e => e.ws != null).map(e => ({ v: +e.ws }));
+  const wts = log.filter(e => e.wt != null).map(e => ({ v: +e.wt, d: e.d }));
+  const wss = log.filter(e => e.ws != null).map(e => ({ v: +e.ws, d: e.d }));
   const first = wts[0], last = wts[wts.length - 1];
   const fw = wss[0], lw = wss[wss.length - 1];
   const toWaist = waistTarget && lw ? +(lw.v - waistTarget).toFixed(1) : null;
   const toGoal = goal && last ? +(last.v - goal).toFixed(1) : null;
+  const dW = first && last ? +(last.v - first.v).toFixed(1) : null;
+  const dS = fw && lw ? +(lw.v - fw.v).toFixed(2) : null;
+  const dir = (v) => v == null || v === 0 ? '' : v < 0 ? ' class="down"' : ' class="up"';
+  const sign = (v) => (v > 0 ? '+' : '') + v;
   $('#stats').innerHTML = `
-    <div><b>${last ? last.v : '-'}</b><span>Weight now</span></div>
-    <div><b>${first && last ? (last.v - first.v > 0 ? '+' : '') + (+(last.v - first.v).toFixed(1)) : '-'}</b><span>Since start</span></div>
-    <div><b>${lw ? lw.v + '"' : '-'}</b><span>Waist now</span></div>
-    <div><b>${fw && lw ? (lw.v - fw.v > 0 ? '+' : '') + (+(lw.v - fw.v).toFixed(2)) + '"' : '-'}</b><span>Waist change</span></div>
-    ${toWaist != null ? `<div><b>${toWaist > 0 ? toWaist + '"' : 'there'}</b><span>To waist target</span></div>` : ''}
-    ${toGoal != null ? `<div><b>${toGoal > 0 ? toGoal + ' lb' : 'there'}</b><span>To goal weight</span></div>` : ''}`;
+    <div><b class="hero">${lw ? lw.v + '"' : '-'}</b><span>Waist now</span></div>
+    <div><b${dir(dS)}>${dS != null ? sign(dS) + '"' : '-'}</b><span>Waist since start</span></div>
+    ${toWaist != null ? `<div><b>${toWaist > 0 ? toWaist + '"' : 'There'}</b><span>To go, target ${waistTarget}"</span></div>` : ''}
+    <div><b>${last ? last.v : '-'}</b><span>Weight now, lb</span></div>
+    <div><b${dir(dW)}>${dW != null ? sign(dW) : '-'}</b><span>Weight since start, lb</span></div>
+    ${toGoal != null ? `<div><b>${toGoal > 0 ? toGoal : 'There'}</b><span>To go, goal ${goal} lb</span></div>` : ''}`;
 
   const c = $('#chart');
   if (wts.length > 1 || wss.length > 1) {
     $('#chartcard').hidden = false;
     c.innerHTML =
-      (wts.length > 1 ? `<p class="muted" style="margin:.2rem 0">Weight</p>` + sparkline(wts, 'var(--accent)', goal) : '') +
-      (wss.length > 1 ? `<p class="muted" style="margin:.6rem 0 .2rem">Waist</p>` + sparkline(wss, 'var(--green)', waistTarget) : '');
+      (wts.length > 1 ? `<p class="eyebrow" style="margin:.2rem 0">Weight, lb</p>` + sparkline(wts, 'var(--series-1)', goal, ' lb', 'Weight') : '') +
+      (wss.length > 1 ? `<p class="eyebrow" style="margin:1rem 0 .2rem">Waist, inches</p>` + sparkline(wss, 'var(--series-2)', waistTarget, '"', 'Waist') : '');
+    wireCharts(c);
   } else {
     $('#chartcard').hidden = true;
   }

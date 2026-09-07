@@ -8,11 +8,11 @@ const PAGES = [
   { file: 'cook.html', label: 'Cook Day' },
   { file: 'shopping.html', label: 'Shopping' },
   { file: 'recipes.html', label: 'Recipes' },
-  { file: 'fuel.html', label: 'Fuel' },
+  { file: 'fuel.html', label: 'Fuel', gap: true },
   { file: 'train.html', label: 'Training' },
   { file: 'plan.html', label: 'The Plan' },
   { file: 'eatout.html', label: 'Eating Out' },
-  { file: 'freezer.html', label: 'Storage' },
+  { file: 'freezer.html', label: 'Storage', gap: true },
   { file: 'track.html', label: 'Progress' },
 ];
 
@@ -92,6 +92,28 @@ function setSelectedWeek(w) { store.set('week', w); location.search = '?w=' + w;
 
 function weekData() { return WEEKS[selectedWeek() - 1]; }
 
+/* ---------- protein family ----------
+   Derived from the meal text rather than stored, so the tag can never drift
+   out of sync with the food. Order matters: the first match wins, and the
+   list is ordered so the main protein beats a garnish (carnitas with a fried
+   egg on top is pork, not egg). */
+
+const PROTEIN = [
+  ['Fish', /salmon|sardine|mackerel|\bcod\b|tuna|shrimp|gambas|\bfish\b|godeungeo/i],
+  ['Poultry', /chicken|wings|shawarma|turkey/i],
+  ['Pork', /carnitas|\bpork\b|jeyuk|belly|samgyeopsal/i],
+  ['Beef', /short rib|bulgogi|carne asada|ground beef|steak|burger|brisket|chuck|kofta|biltong|jerky|\bbeef\b|galbi/i],
+  ['Plant', /lentil|\bbean|edamame|chickpea|hummus|tofu|chili/i],
+  ['Dairy', /yogurt|cottage cheese|whey|kefir/i],
+  ['Eggs', /\begg|gyeranjjim/i],
+];
+
+function proteinTag(text) {
+  if (!text) return '';
+  const hit = PROTEIN.find(([, re]) => re.test(text));
+  return hit ? `<span class="tag">${esc(hit[0])}</span>` : '';
+}
+
 /* ---------- eating window ---------- */
 
 function activeWindow() {
@@ -126,12 +148,13 @@ function renderChrome(active) {
     <header class="top">
       <div class="brand">
         <a href="index.html">Reset Kitchen</a>
-        <span class="tag">cook once, eat all week</span>
+        <span class="sub">cook once, eat all week</span>
         <span class="spacer"></span>
         <span class="phase">${esc(phase)}</span>
       </div>
       <nav class="tabs">
-        ${PAGES.map((p) => `<a href="${p.file}"${p.file === active ? ' aria-current="page"' : ''}>${esc(p.label)}</a>`).join('')}
+        ${PAGES.map((p, i) => (p.gap ? '<span class="sep"></span>' : '') +
+          `<a href="${p.file}"${p.file === active ? ' aria-current="page"' : ''}>${esc(p.label)}</a>`).join('')}
       </nav>
     </header>`);
 
