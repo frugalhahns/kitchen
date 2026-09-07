@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipes - Reset Kitchen</title>
+<meta name="description" content="Every recipe in the rotation, with the sugar-free and grain-free modifications.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('recipes.html');
+const CATS = [
+  ['all', 'Everything'], ['beef', 'Beef'], ['chicken', 'Chicken'], ['pork', 'Pork'],
+  ['fish', 'Fish'], ['egg', 'Eggs'], ['banchan', 'Banchan'], ['base', 'Bases'],
+];
+
+$('#main').innerHTML = `
+  <h1>Recipes</h1>
+  <p class="lede">Every dish in the four-week rotation. Each one lists what to change to keep it free of sugar and grain, because almost no Korean recipe you find online is written that way. Outside links go to the full original.</p>
+  <input class="rsearch" id="q" type="search" placeholder="Search by name, ingredient or Korean" autocomplete="off">
+  <div class="cats" id="cats">${CATS.map(([k, l], i) => `<button data-c="${k}" class="${i === 0 ? 'on' : ''}">${esc(l)}</button>`).join('')}</div>
+  <div id="list"></div>
+  <p class="muted" id="count"></p>
+`;
+
+let cat = 'all', q = '';
+
+function matches(id, r) {
+  if (cat !== 'all' && r.cat !== cat) return false;
+  if (!q) return true;
+  const hay = [r.name, r.ko, r.cat, r.reset, r.note, ...(r.ing || [])].join(' ').toLowerCase();
+  return hay.includes(q);
+}
+
+function draw() {
+  const ids = Object.keys(RECIPES).filter(id => matches(id, RECIPES[id]));
+  $('#list').innerHTML = ids.map(id => {
+    const r = RECIPES[id];
+    return `<details class="recipe" id="${id}">
+      <summary><b>${esc(r.name)}</b>${r.ko ? `<span class="ko">${esc(r.ko)}</span>` : ''}<span class="meta">${esc(r.time)}</span></summary>
+      ${renderRecipeBody(id, r)}
+    </details>`;
+  }).join('') || '<div class="card"><p class="muted">Nothing matches that.</p></div>';
+  $('#count').textContent = ids.length + ' of ' + Object.keys(RECIPES).length + ' recipes';
+  openFromHash();
+}
+
+function openFromHash() {
+  const h = location.hash.slice(1);
+  if (!h) return;
+  const d = document.getElementById(h);
+  if (d && d.tagName === 'DETAILS') {
+    d.open = true;
+    d.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+}
+
+$('#q').oninput = (e) => { q = e.target.value.trim().toLowerCase(); draw(); };
+$('#cats').onclick = (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  cat = b.dataset.c;
+  $('#cats').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  draw();
+};
+window.addEventListener('hashchange', openFromHash);
+draw();
+</script>
+</body>
+</html>

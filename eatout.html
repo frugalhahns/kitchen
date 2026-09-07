@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eating Out - Reset Kitchen</title>
+<meta name="description" content="How to order out without undoing the week, and the fifteen-minute meals that keep you from having to.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('eatout.html');
+$('#main').innerHTML = `
+  <h1>Eating Out</h1>
+  <p class="lede">${esc(EATOUT.intro)}</p>
+
+  <h2>First, the fifteen-minute meals</h2>
+  <p class="muted">Read this list before you open a delivery app. Every one of these is faster than delivery arrives.</p>
+  <div class="card">
+    ${EATOUT.fifteenMin.map(m => `<div class="qa"><b>${esc(m.meal)}</b><p>${esc(m.how)}</p></div>`).join('')}
+  </div>
+
+  <h2>Ordering, by restaurant</h2>
+  <div class="grid two">
+    ${EATOUT.places.map(p => `<div class="card">
+      <h3>${esc(p.where)}</h3>
+      <div class="flag freeze"><b>Order:</b> ${esc(p.order)}</div>
+      <div class="flag reset"><b>Skip:</b> ${esc(p.avoid)}</div>
+    </div>`).join('')}
+  </div>
+
+  <h2>The two traps</h2>
+  <div class="card">
+    <div class="qa"><b>Marinade is sugar.</b><p>Anything described as marinated, glazed, teriyaki, sweet and spicy, or bulgogi-style at a restaurant is carrying corn syrup. Unmarinated cuts, salt-grilled fish and clear soups are the safe half of every Korean menu.</p></div>
+    <div class="qa"><b>The banchan are not all free.</b><p>Most of them are vegetables and they are the best part of eating Korean on a reset. But myeolchi bokkeum, candied lotus root, potato salad, corn cheese and japchae are sugar and starch. Eat the kimchi, the namul, the sprouts and the cucumber, and leave the shiny ones.</p></div>
+  </div>
+`;
+</script>
+</body>
+</html>

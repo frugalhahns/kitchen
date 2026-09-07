@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progress - Reset Kitchen</title>
+<meta name="description" content="Weight, waist and lab dates. Stored only in this browser.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('track.html');
+$('#main').innerHTML = `
+  <h1>Progress</h1>
+  <p class="lede">Once a week, same morning, same conditions. Waist at the navel is the number that answers the belly-fat question, and it often moves when the scale will not. Everything here is saved only in this browser and is never sent anywhere.</p>
+
+  <div class="card">
+    <div class="inputrow">
+      <label>Date<input type="date" id="d"></label>
+      <label>Weight (lb)<input type="number" step="0.2" id="wt" inputmode="decimal"></label>
+      <label>Waist (in)<input type="number" step="0.25" id="ws" inputmode="decimal"></label>
+      <button id="save">Log it</button>
+    </div>
+    <div class="stat" id="stats"></div>
+  </div>
+
+  <div class="card" id="chartcard" hidden>
+    <h3>Trend</h3>
+    <div id="chart"></div>
+  </div>
+
+  <div class="card">
+    <table class="log"><thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Waist</th><th>Change</th><th></th></tr></thead>
+    <tbody id="rows"></tbody></table>
+    <p class="muted" id="empty" hidden style="margin-top:.6rem">Nothing logged yet. Weigh in Saturday morning and start the baseline.</p>
+  </div>
+
+  <h2>Bloodwork</h2>
+  <div class="card">
+    <p style="margin-top:0">${esc(PROTOCOL.labs.body)}</p>
+    <div class="inputrow" style="margin-top:1rem">
+      <label>Panel drawn<input type="date" id="labd"></label>
+      <label style="width:auto">Note<input type="text" id="labn" placeholder="baseline, week 12..." style="width:12rem"></label>
+      <button id="labsave">Log panel</button>
+    </div>
+    <table class="log"><thead><tr><th>Date</th><th>Note</th><th></th></tr></thead><tbody id="labrows"></tbody></table>
+  </div>
+`;
+
+$('#d').value = iso(today());
+$('#labd').value = iso(today());
+
+const fmt = (v, u) => v == null || v === '' ? '<span class="muted">-</span>' : v + (u || '');
+function delta(cur, prev, u) {
+  if (cur == null || prev == null) return '<span class="muted">-</span>';
+  const d = +(cur - prev).toFixed(1);
+  if (d === 0) return '<span class="muted">even</span>';
+  const col = d < 0 ? 'var(--green)' : 'var(--accent)';
+  return `<span style="color:${col}">${d > 0 ? '+' : ''}${d}${u || ''}</span>`;
+}
+
+function sparkline(pts, color) {
+  if (pts.length < 2) return '';
+  const w = 320, h = 60, pad = 4;
+  const xs = pts.map((p, i) => pad + i * (w - 2 * pad) / (pts.length - 1));
+  const min = Math.min(...pts.map(p => p.v)), max = Math.max(...pts.map(p => p.v));
+  const span = (max - min) || 1;
+  const ys = pts.map(p => h - pad - ((p.v - min) / span) * (h - 2 * pad));
+  const d = xs.map((x, i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + ys[i].toFixed(1)).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${xs.map((x, i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2.5" fill="${color}"/>`).join('')}
+  </svg>`;
+}
+
+function draw() {
+  const log = store.get('log', []).slice().sort((a, b) => a.d.localeCompare(b.d));
+  $('#empty').hidden = log.length > 0;
+
+  $('#rows').innerHTML = log.map((e, i) => {
+    const p = i > 0 ? log[i - 1] : null;
+    return `<tr>
+      <td>${esc(e.d)}</td>
+      <td>${fmt(e.wt)}</td><td>${delta(e.wt, p && p.wt != null ? p.wt : null)}</td>
+      <td>${fmt(e.ws, '"')}</td><td>${delta(e.ws, p && p.ws != null ? p.ws : null, '"')}</td>
+      <td><button data-del="${esc(e.d)}">remove</button></td>
+    </tr>`;
+  }).reverse().join('');
+
+  const wts = log.filter(e => e.wt != null).map(e => ({ v: +e.wt }));
+  const wss = log.filter(e => e.ws != null).map(e => ({ v: +e.ws }));
+  const first = wts[0], last = wts[wts.length - 1];
+  const fw = wss[0], lw = wss[wss.length - 1];
+  $('#stats').innerHTML = `
+    <div><b>${last ? last.v : '-'}</b><span>Weight now</span></div>
+    <div><b>${first && last ? (last.v - first.v > 0 ? '+' : '') + (+(last.v - first.v).toFixed(1)) : '-'}</b><span>Since start</span></div>
+    <div><b>${lw ? lw.v + '"' : '-'}</b><span>Waist now</span></div>
+    <div><b>${fw && lw ? (lw.v - fw.v > 0 ? '+' : '') + (+(lw.v - fw.v).toFixed(2)) + '"' : '-'}</b><span>Waist change</span></div>`;
+
+  const c = $('#chart');
+  if (wts.length > 1 || wss.length > 1) {
+    $('#chartcard').hidden = false;
+    c.innerHTML =
+      (wts.length > 1 ? `<p class="muted" style="margin:.2rem 0">Weight</p>` + sparkline(wts, 'var(--accent)') : '') +
+      (wss.length > 1 ? `<p class="muted" style="margin:.6rem 0 .2rem">Waist</p>` + sparkline(wss, 'var(--green)') : '');
+  } else {
+    $('#chartcard').hidden = true;
+  }
+
+  $('#rows').querySelectorAll('button[data-del]').forEach(b => {
+    b.onclick = () => {
+      store.set('log', store.get('log', []).filter(e => e.d !== b.dataset.del));
+      draw();
+    };
+  });
+
+  const labs = store.get('labs', []).slice().sort((a, b) => a.d.localeCompare(b.d));
+  $('#labrows').innerHTML = labs.map(l => `<tr><td>${esc(l.d)}</td><td>${esc(l.n || '')}</td>
+    <td><button data-labdel="${esc(l.d)}">remove</button></td></tr>`).join('')
+    || '<tr><td colspan="3" class="muted">No panels logged. Get the baseline drawn in the next two weeks.</td></tr>';
+  $('#labrows').querySelectorAll('button[data-labdel]').forEach(b => {
+    b.onclick = () => {
+      store.set('labs', store.get('labs', []).filter(l => l.d !== b.dataset.labdel));
+      draw();
+    };
+  });
+}
+
+$('#save').onclick = () => {
+  const d = $('#d').value;
+  if (!d) return alert('Pick a date.');
+  const wt = $('#wt').value === '' ? null : +$('#wt').value;
+  const ws = $('#ws').value === '' ? null : +$('#ws').value;
+  if (wt == null && ws == null) return alert('Enter a weight or a waist measurement.');
+  const log = store.get('log', []).filter(e => e.d !== d);
+  log.push({ d, wt, ws });
+  store.set('log', log);
+  $('#wt').value = ''; $('#ws').value = '';
+  draw();
+};
+
+$('#labsave').onclick = () => {
+  const d = $('#labd').value;
+  if (!d) return;
+  const labs = store.get('labs', []).filter(l => l.d !== d);
+  labs.push({ d, n: $('#labn').value });
+  store.set('labs', labs);
+  $('#labn').value = '';
+  draw();
+};
+
+draw();
+</script>
+</body>
+</html>

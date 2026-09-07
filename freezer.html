@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freezer - Reset Kitchen</title>
+<meta name="description" content="What is actually in the freezer, so you never have to guess.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('freezer.html');
+// Master list: every freezable thing the cycle produces, deduped.
+const MASTER = [...new Set(WEEKS.flatMap(w => w.freezer))]
+  .filter(x => !/^Whatever/.test(x));
+
+$('#main').innerHTML = `
+  <h1>Freezer</h1>
+  <p class="lede">The freezer is the whole plan. When it has food in it, a bad Wednesday costs you fifteen minutes instead of eighty dollars. Tap the plus when you put something in, the minus when you take it out.</p>
+  <div class="tools">
+    <button id="add">Add your own item</button>
+    <button id="zero">Set everything to zero</button>
+  </div>
+  <div class="card" id="inv"></div>
+  <div class="card">
+    <div class="stat" id="stats"></div>
+  </div>
+  <h2>Freezing, done right</h2>
+  <div class="card">
+    <div class="qa"><b>Flat bags, always.</b><p>A quart bag frozen flat thaws in a bowl of water in twenty minutes and stacks like a file folder. The same bag frozen in a lump takes two hours and lives at the back forever.</p></div>
+    <div class="qa"><b>Chill it cold before it goes in.</b><p>Warm food forms big ice crystals that shred texture on the way back out, and it partially thaws its neighbors. Ice bath, or spread it on a sheet pan first.</p></div>
+    <div class="qa"><b>Raw in marinade beats cooked, for beef and pork.</b><p>Bulgogi, LA galbi and jeyuk bokkeum all go in raw. The marinade keeps working while it thaws, so the bag you pull in week three is better than the one you sealed. Cooked steak is the exception, because sous vide plus ice bath plus seal is already perfect.</p></div>
+    <div class="qa"><b>Soups and stews freeze best of everything.</b><p>Yukgaejang, galbijjim, kimchi jjigae and every guk in the plan come back indistinguishable. Add tofu after thawing, never before, or it turns spongy.</p></div>
+    <div class="qa"><b>Write on the bag.</b><p>Dish and date, in marker, before it goes in. Nobody has ever correctly identified a frozen brown block by looking at it.</p></div>
+  </div>
+`;
+
+function draw() {
+  const inv = store.get('freezer', {});
+  const custom = store.get('freezerCustom', []);
+  const all = [...MASTER, ...custom];
+  $('#inv').innerHTML = all.map((item, i) => {
+    const n = inv[item] || 0;
+    return `<div class="frz${n === 0 ? ' zero' : ''}">
+      <span class="n">${esc(item)}</span>
+      <button data-d="-1" data-item="${esc(item)}">&minus;</button>
+      <span class="qty">${n}</span>
+      <button data-d="1" data-item="${esc(item)}">+</button>
+    </div>`;
+  }).join('');
+
+  const total = Object.values(inv).reduce((a, b) => a + b, 0);
+  const stocked = Object.values(inv).filter(v => v > 0).length;
+  const meals = Object.entries(inv).filter(([, v]) => v > 0).length;
+  $('#stats').innerHTML = `
+    <div><b>${total}</b><span>Items banked</span></div>
+    <div><b>${stocked}</b><span>Kinds in stock</span></div>
+    <div><b>${meals >= 4 ? 'Good' : meals >= 2 ? 'Thin' : 'Empty'}</b><span>State of things</span></div>`;
+
+  $('#inv').querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
+      const i2 = store.get('freezer', {});
+      const item = b.dataset.item;
+      i2[item] = Math.max(0, (i2[item] || 0) + (+b.dataset.d));
+      store.set('freezer', i2);
+      draw();
+    };
+  });
+}
+
+$('#add').onclick = () => {
+  const v = prompt('What went into the freezer?');
+  if (!v) return;
+  const c = store.get('freezerCustom', []);
+  if (!c.includes(v)) c.push(v);
+  store.set('freezerCustom', c);
+  const inv = store.get('freezer', {});
+  inv[v] = (inv[v] || 0) + 1;
+  store.set('freezer', inv);
+  draw();
+};
+$('#zero').onclick = () => { if (confirm('Set every count to zero?')) { store.set('freezer', {}); draw(); } };
+draw();
+</script>
+</body>
+</html>

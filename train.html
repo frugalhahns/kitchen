@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training - Reset Kitchen</title>
+<meta name="description" content="Four days on the Tonal, plus the walking that matters more.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('train.html');
+const st = resetState();
+$('#main').innerHTML = `
+  <h1>Training</h1>
+  <p class="lede">${esc(TRAINING.intro)}</p>
+
+  <h2>The week</h2>
+  <div class="grid" id="tw"></div>
+
+  <h2>The five things around the lifting</h2>
+  <div class="card">
+    ${TRAINING.layers.map(l => `<div class="qa"><b>${esc(l.thing)}</b><p>${esc(l.why)}</p></div>`).join('')}
+  </div>
+
+  <h2>Fasting and lifting</h2>
+  <div class="card"><p style="margin:0">${esc(TRAINING.ifNote)}</p></div>
+
+  <h2>Session log</h2>
+  <p class="muted">Four checkboxes a week. Not a training journal, just a record of whether the four days actually happened, because that is the variable that predicts everything else.</p>
+  <div class="card" id="log"></div>
+`;
+
+$('#tw').innerHTML = TRAINING.week.map(d => {
+  const lift = CONFIG.liftDays.includes(d.day);
+  return `<div class="day">
+    <div class="dh"><b>${esc(d.day)}</b><span class="spacer"></span>
+      <span class="pill ${lift ? 'lift' : 'rest'}">${lift ? 'Tonal' : 'Support'}</span></div>
+    <div class="meal"><span class="when">Do</span><span class="what">${esc(d.what)}</span></div>
+    <div class="meal"><span class="when">Eat</span><span class="what">${esc(d.food)}</span></div>
+  </div>`;
+}).join('');
+
+// 12 weeks x 4 lift days
+const key = 'lifts';
+const done = store.get(key, {});
+let rows = '';
+for (let r = 1; r <= CONFIG.resetWeeks; r++) {
+  const mon = addDays(parseISO(CONFIG.cycleStart), (r - 1) * 7);
+  const isNow = st.started && st.resetWeek === r;
+  rows += `<div class="frz${isNow ? '' : ''}" style="${isNow ? 'background:var(--accent-soft);margin:0 -.5rem;padding:.55rem .5rem;border-radius:8px' : ''}">
+    <span class="n"><b>Week ${r}</b> <span class="muted">${esc(fmtShort(mon))}</span></span>
+    ${CONFIG.liftDays.map(d => {
+      const k = r + ':' + d;
+      return `<label style="display:inline-flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.62rem;color:var(--ink-3);cursor:pointer">
+        ${esc(d)}<input type="checkbox" data-k="${k}" ${done[k] ? 'checked' : ''} style="width:1.1rem;height:1.1rem;accent-color:var(--accent)">
+      </label>`;
+    }).join('')}
+  </div>`;
+}
+$('#log').innerHTML = rows + `<p class="muted" style="margin-top:.8rem" id="tally"></p>`;
+
+function tally() {
+  const d = store.get(key, {});
+  const n = Object.keys(d).length;
+  $('#tally').textContent = n + ' of ' + (CONFIG.resetWeeks * CONFIG.liftDays.length) + ' sessions logged.';
+}
+$('#log').querySelectorAll('input').forEach(cb => {
+  cb.onchange = () => {
+    const d = store.get(key, {});
+    if (cb.checked) d[cb.dataset.k] = 1; else delete d[cb.dataset.k];
+    store.set(key, d);
+    tally();
+  };
+});
+tally();
+</script>
+</body>
+</html>

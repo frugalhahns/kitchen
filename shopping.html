@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopping - Reset Kitchen</title>
+<meta name="description" content="The week's shopping list, by store section.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('shopping.html');
+const w = weekData();
+const mon = mondayForCycleWeek(w.n);
+const shopDay = addDays(mon, -2);
+
+const sections = Object.keys(w.shop);
+$('#main').innerHTML = `
+  <h1>Shopping: Week ${w.n}</h1>
+  <p class="lede">Saturday ${esc(fmtShort(shopDay))}. One Korean market and one regular store, about ninety minutes. Eat before you go.</p>
+  <div id="wb"></div>
+  <div class="tools">
+    <button onclick="window.print()">Print or save as PDF</button>
+    <button id="clear">Uncheck everything</button>
+    <a class="btn" href="cook.html">Then: cook day plan</a>
+  </div>
+  <div class="grid two" id="lists"></div>
+  <h2>Never let these run out</h2>
+  <div class="card">
+    ${PANTRY.map(p => `<div class="qa"><b>${esc(p.item)}</b><p>${esc(p.why)}</p></div>`).join('')}
+  </div>
+`;
+weekBar('#wb');
+
+const key = 'shop.' + iso(mon);
+$('#lists').innerHTML = sections.map(sec => {
+  const items = w.shop[sec];
+  return `<div class="card"><h3>${esc(sec)}</h3><ul class="check" data-sec="${esc(sec)}">${
+    items.map(it => `<li><label><input type="checkbox" value="${esc(it)}"><span>${esc(it)}</span></label></li>`).join('')
+  }</ul></div>`;
+}).join('');
+
+const state = store.get(key, {});
+$('#lists').querySelectorAll('input').forEach(cb => {
+  if (state[cb.value]) cb.checked = true;
+  cb.onchange = () => {
+    const s = store.get(key, {});
+    if (cb.checked) s[cb.value] = 1; else delete s[cb.value];
+    store.set(key, s);
+  };
+});
+$('#clear').onclick = () => { store.del(key); location.reload(); };
+</script>
+</body>
+</html>

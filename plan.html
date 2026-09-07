@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Plan - Reset Kitchen</title>
+<meta name="description" content="The rules of the reset, why each one is there, and what to do when it stalls.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('plan.html');
+$('#main').innerHTML = `
+  <h1>The Plan</h1>
+  <p class="lede">${esc(PROTOCOL.headline)}</p>
+
+  <h2>${esc(PROTOCOL.reset.title)}</h2>
+  <div class="card"><p style="margin:0">${esc(PROTOCOL.reset.body)}</p></div>
+
+  <h2>The rules</h2>
+  <div class="card"><ol class="rules">
+    ${PROTOCOL.rules.map(r => `<li><b>${esc(r.rule)}</b><p>${esc(r.detail)}</p></li>`).join('')}
+  </ol></div>
+
+  <h2>${esc(PROTOCOL.labs.title)}</h2>
+  <div class="card"><p style="margin:0">${esc(PROTOCOL.labs.body)}</p></div>
+
+  <h2>When it stops working</h2>
+  <div class="card">
+    ${PROTOCOL.troubleshoot.map(t => `<div class="qa"><b>${esc(t.q)}</b><p>${esc(t.a)}</p></div>`).join('')}
+  </div>
+
+  <h2>The pantry</h2>
+  <div class="card">
+    ${PANTRY.map(p => `<div class="qa"><b>${esc(p.item)}</b><p>${esc(p.why)}</p></div>`).join('')}
+  </div>
+
+  <h2>How the four-week cycle is built</h2>
+  <div class="card">
+    ${WEEKS.map(w => `<div class="qa"><b>Week ${w.n}: ${esc(w.title)} <span class="muted" style="font-weight:400">- ${esc(w.cookTime)} cook day</span></b><p>${esc(w.theme)}</p></div>`).join('')}
+    <p class="muted" style="margin-top:.8rem">Week 4 being easy is the design, not a gap. Three hard cook days followed by a light one is what a person can actually repeat for twelve weeks.</p>
+  </div>
+`;
+</script>
+</body>
+</html>

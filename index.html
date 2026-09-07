@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>This Week - Reset Kitchen</title>
+<meta name="description" content="The week's batch-cooked meals at a glance.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('index.html');
+const w = weekData();
+const st = resetState();
+const mon = mondayForCycleWeek(w.n);
+const todayISO = iso(today());
+const bday = CONFIG.birthday ? parseISO(CONFIG.birthday) : null;
+
+const pct = st.started ? Math.min(100, Math.round((st.resetWeek - 1) / CONFIG.resetWeeks * 100)) : 0;
+
+let banner = '';
+if (!st.started) {
+  banner = `<div class="card"><b>Week 1 starts Monday ${esc(fmtShort(parseISO(CONFIG.cycleStart)))}.</b>
+    <p class="muted" style="margin:.35rem 0 0">Shop the Saturday before (${esc(fmtShort(addDays(parseISO(CONFIG.cycleStart), -2)))}) and batch cook the Sunday (${esc(fmtShort(addDays(parseISO(CONFIG.cycleStart), -1)))}). Start with the <a href="plan.html">Plan</a> and the <a href="shopping.html">Shopping list</a>.</p></div>`;
+} else if (st.done) {
+  banner = `<div class="card"><b>Twelve weeks done.</b><p class="muted" style="margin:.35rem 0 0">Time to get the bloodwork redrawn and compare it to your baseline. The cycle keeps repeating in the meantime.</p></div>`;
+}
+
+$('#main').innerHTML = `
+  <h1>Week ${w.n}: ${esc(w.title)}</h1>
+  <p class="lede">${esc(w.theme)}</p>
+  ${st.started && !st.done ? `<div class="bar"><i style="width:${pct}%"></i></div><p class="muted">Week ${st.resetWeek} of ${CONFIG.resetWeeks} in the reset. Cycle week ${st.cycleWeek} of ${WEEKS.length}.</p>` : ''}
+  <div id="wb"></div>
+  ${banner}
+  <div class="tools">
+    <a class="btn" href="cook.html">Sunday cook plan (${esc(w.cookTime)})</a>
+    <a class="btn" href="shopping.html">Shopping list</a>
+    <a class="btn" href="recipes.html">All recipes</a>
+  </div>
+  <div class="grid" id="days"></div>
+  <h2>Into the freezer this week</h2>
+  <div class="card"><ul style="margin:0;padding-left:1.2rem">${w.freezer.map(f => `<li style="margin:.25rem 0">${esc(f)}</li>`).join('')}</ul>
+    <p class="muted" style="margin-top:.7rem">Keep the count current on the <a href="freezer.html">Freezer page</a> so you know what you can pull without opening the door.</p></div>
+`;
+
+weekBar('#wb');
+
+$('#days').innerHTML = w.days.map((d, i) => {
+  const date = addDays(mon, i);
+  const isToday = iso(date) === todayISO;
+  const isBday = bday && iso(date) === iso(bday);
+  const m1r = d.m1r ? recipeChip(d.m1r) : '';
+  const m2r = d.m2r ? recipeChip(d.m2r) : '';
+  return `
+  <div class="day${isToday ? ' today' : ''}" ${isToday ? 'id="today"' : ''}>
+    <div class="dh">
+      <b>${esc(d.day)}</b>
+      <span class="date">${esc(fmtShort(date))}</span>
+      <span class="spacer"></span>
+      ${isToday ? '<span class="pill today">Today</span>' : ''}
+      ${isBday ? '<span class="pill free">Birthday</span>' : ''}
+      <span class="pill ${d.lift ? 'lift' : 'rest'}">${d.lift ? 'Tonal' : 'No lift'}</span>
+    </div>
+    <div class="meal"><span class="when">${CONFIG.window.start}</span><span class="what">${esc(d.m1)}${m1r}</span></div>
+    <div class="meal"><span class="when">Dinner</span><span class="what">${esc(d.m2)}${m2r}</span></div>
+    ${d.post ? `<div class="postnote">${esc(d.post)}</div>` : ''}
+    ${d.kid ? `<div class="kidline"><b>Son:</b> ${esc(d.kid)}</div>` : ''}
+    ${isBday ? `<div class="postnote"><b>Turning 41.</b> Go to Korean BBQ and order galbi, chadolbaegi and a mountain of lettuce. Skip the rice, the naengmyeon and the soju. You can have a real celebration meal that costs the reset nothing, and doing it that way is the difference between a birthday and a relapse.</div>` : ''}
+    ${d.note ? `<div class="daynote">${esc(d.note)}</div>` : ''}
+  </div>`;
+}).join('');
+
+if ($('#today')) setTimeout(() => $('#today').scrollIntoView({ block: 'center', behavior: 'smooth' }), 200);
+</script>
+</body>
+</html>

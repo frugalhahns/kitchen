@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cook Day - Reset Kitchen</title>
+<meta name="description" content="The timed Sunday batch-cooking plan.">
+<meta name="theme-color" content="#b8402b">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="data/plan.js"></script>
+<script src="assets/app.js"></script>
+<script>
+renderChrome('cook.html');
+const w = weekData();
+const mon = mondayForCycleWeek(w.n);
+const cookDay = addDays(mon, -1);
+
+$('#main').innerHTML = `
+  <h1>Cook Day: Week ${w.n}</h1>
+  <p class="lede">Sunday ${esc(fmtShort(cookDay))}. About ${esc(w.cookTime)}, and most of that is waiting rather than working. The order matters more than the recipes do: long unattended things go in first, and the oven and the boiling water each get used twice.</p>
+  <div id="wb"></div>
+  <div class="tools">
+    <a class="btn" href="shopping.html">Shopping list first</a>
+    <button id="reset">Clear the checkmarks</button>
+  </div>
+  <div class="card"><ol class="tl" id="tl"></ol></div>
+  <h2>What you should have at the end</h2>
+  <div class="card">
+    <h3>In the fridge</h3>
+    <p class="muted">Portioned dinners for Monday through Friday, three jars of banchan, a dozen soft-boiled eggs, and one fresh-cook night's worth of raw fish or meat.</p>
+    <h3 style="margin-top:1rem">In the freezer</h3>
+    <ul style="margin:0;padding-left:1.2rem">${w.freezer.map(f => `<li style="margin:.25rem 0">${esc(f)}</li>`).join('')}</ul>
+  </div>
+  <h2>Rules that make the cook day work</h2>
+  <div class="card">
+    <div class="qa"><b>Portion it before you put it away.</b><p>Bulk containers get eaten out of standing at the fridge. Individual portions get eaten as meals. This is the single highest-return habit of the whole day.</p></div>
+    <div class="qa"><b>Freeze flat, label with a marker.</b><p>Flat bags stack, thaw in 20 minutes in a bowl of water, and let you read what they are. Write the dish and the date directly on the bag.</p></div>
+    <div class="qa"><b>Chill completely before freezing.</b><p>Warm food freezes into ice crystals that wreck texture, and it warms everything around it. Ice bath the sous vide bags, spread the cauliflower rice on a sheet pan.</p></div>
+    <div class="qa"><b>Save every rendered fat.</b><p>The schmaltz off the chicken pan and the tallow skimmed off the galbijjim are the best cooking fats you will have all week, and they are free.</p></div>
+    <div class="qa"><b>Clean as the timers run.</b><p>There are four or five 20-minute unattended stretches in this plan. Use them and you finish with an empty sink instead of a three-hour cook followed by a fight about the kitchen.</p></div>
+  </div>
+`;
+
+weekBar('#wb');
+
+const key = 'cook.' + iso(cookDay);
+const done = store.get(key, {});
+$('#tl').innerHTML = w.cook.map((s, i) => `
+  <li>
+    <span class="t">${esc(s.at)}</span>
+    <span class="b">
+      <label style="display:flex;gap:.6rem;align-items:flex-start;cursor:pointer">
+        <input type="checkbox" data-i="${i}" ${done[i] ? 'checked' : ''} style="margin-top:.28rem;width:1.05rem;height:1.05rem;accent-color:var(--accent);flex:0 0 auto">
+        <span style="${done[i] ? 'text-decoration:line-through;color:var(--ink-3)' : ''}">${esc(s.do)}${s.why ? `<span class="why">${esc(s.why)}</span>` : ''}</span>
+      </label>
+    </span>
+  </li>`).join('');
+
+$('#tl').querySelectorAll('input').forEach(cb => {
+  cb.onchange = () => {
+    const s = store.get(key, {});
+    if (cb.checked) s[cb.dataset.i] = 1; else delete s[cb.dataset.i];
+    store.set(key, s);
+    const span = cb.nextElementSibling;
+    span.style.textDecoration = cb.checked ? 'line-through' : '';
+    span.style.color = cb.checked ? 'var(--ink-3)' : '';
+  };
+});
+
+$('#reset').onclick = () => { store.del(key); location.reload(); };
+</script>
+</body>
+</html>
