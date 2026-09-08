@@ -16,6 +16,7 @@
 renderChrome('index.html');
 const w = weekData();
 const win = activeWindow();
+const slug = cuisineSlug(w.cuisine);
 const st = resetState();
 const mon = mondayForCycleWeek(w.n);
 const cookDay = addDays(mon, -1);
@@ -34,8 +35,9 @@ if (!st.started) {
 
 $('#main').innerHTML = `
   <header class="mast">
+    ${cuisineGround(slug)}
     <span class="num" aria-hidden="true">${w.n}</span>
-    <p class="eyebrow"><span class="dot"></span>Week ${w.n} of the cycle<span class="dot"></span>${esc(w.cuisine)}</p>
+    <p class="eyebrow">${cuisineGlyph(slug, 26)}<span>Week ${w.n} of the cycle</span><span class="dot"></span><span>${esc(w.cuisine)}</span></p>
     <h1>${esc(w.title)}</h1>
     <p class="lede">${esc(w.theme)}</p>
     <div class="facts">
@@ -124,7 +126,20 @@ $('#days').innerHTML = w.days.map((d, i) => {
   </div>`;
 }).join('');
 
-if ($('#today')) setTimeout(() => $('#today').scrollIntoView({ block: 'center', behavior: 'smooth' }), 200);
+/* jump back to today, shown only once today has scrolled out of view */
+const todayCard = $('#today');
+if (todayCard) {
+  setTimeout(() => todayCard.scrollIntoView({ block: 'center', behavior: 'smooth' }), 200);
+  document.body.insertAdjacentHTML('beforeend', '<button class="totoday" id="jt">Today</button>');
+  const btn = $('#jt');
+  btn.onclick = () => todayCard.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(
+      ([e]) => btn.classList.toggle('on', !e.isIntersecting),
+      { threshold: 0.15 }
+    ).observe(todayCard);
+  }
+}
 </script>
 </body>
 </html>

@@ -928,3 +928,118 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
   margin: var(--s-3) 0;
   max-width: 60ch;
 }
+
+/* ============================================================
+   Cuisine art: the motif tiled faintly as a ground, and once at
+   size as the week's emblem. Geometry only, tone on tone.
+   ============================================================ */
+
+.ground {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--accent);
+  opacity: .07;
+  pointer-events: none;
+}
+@media (prefers-color-scheme: dark) { .ground { opacity: .1; } }
+
+.glyph { color: var(--accent); flex: 0 0 auto; }
+
+.mast .eyebrow .glyph { margin-right: .1rem; }
+.mast .ground {
+  /* fade the tiling out to the left so the text sits on clean stock */
+  -webkit-mask-image: linear-gradient(100deg, transparent 8%, #000 62%);
+  mask-image: linear-gradient(100deg, transparent 8%, #000 62%);
+}
+
+/* ============================================================
+   Mobile menu: one tap, grouped, no JS needed to open it
+   ============================================================ */
+
+.menu { display: none; }
+.menu > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: .1rem var(--s-4) var(--s-3);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary .cur {
+  font-size: var(--t-ms);
+  font-weight: 650;
+  color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 100px;
+  padding: .34rem .8rem;
+}
+.menu > summary .chev {
+  width: .5rem;
+  height: .5rem;
+  border-right: 1.5px solid var(--ink-3);
+  border-bottom: 1.5px solid var(--ink-3);
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform .18s ease;
+}
+.menu[open] > summary .chev { transform: rotate(-135deg) translateY(-1px); }
+.menu-body {
+  border-top: 1px solid var(--line);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  display: grid;
+  gap: var(--s-4);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.menu-group .eyebrow { margin: 0 0 var(--s-1); }
+.menu-group a {
+  display: block;
+  padding: .5rem .1rem;
+  font-size: var(--t-md);
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+.menu-group a:last-child { border-bottom: none; }
+.menu-group a[aria-current="page"] { color: var(--accent); font-weight: 650; }
+
+@media (max-width: 700px) {
+  nav.tabs { display: none; }
+  .menu { display: block; }
+  .brand .sub { display: none; }
+  /* a touch more air between lines on a phone */
+  body { font-size: 1.02rem; }
+  .mast { padding: var(--s-4); }
+  .mast .facts { gap: var(--s-3) var(--s-4); }
+}
+
+/* ============================================================
+   Jump-to-today, only while today is off screen
+   ============================================================ */
+
+.totoday {
+  position: fixed;
+  right: var(--s-4);
+  bottom: var(--s-4);
+  z-index: 40;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  border-radius: 100px;
+  font: inherit;
+  font-size: var(--t-ms);
+  font-weight: 600;
+  padding: .55rem 1rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.totoday.on { opacity: 1; transform: none; pointer-events: auto; }

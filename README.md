@@ -129,6 +129,25 @@ anchors rather than staples, the big soup has a chicken version, and the plan sa
 explicitly what to change if the week 12 ApoB comes back up. See "The protein mix, with
 your labs in mind" on the Plan page.
 
+## The art
+
+Each of the four cuisines has a tile tradition, so the motif comes from that rather than
+from food illustration: **bojagi** patchwork for Korean, **Talavera** for Mexican, a
+**khatam** eight-point star for Middle Eastern, an **azulejo** lattice for Spanish. Each
+appears twice, from one definition in `ART`: tiled faintly as a ground behind the
+masthead, and once at size as the week's emblem beside the eyebrow. Geometry only, no
+raster assets, `currentColor` so it follows the week's accent, and masked to fade out
+before it reaches the text. It is the same system as the accents, which is why it reads
+as intentional rather than as decoration.
+
+## Navigation
+
+Below 700px the tab strip is replaced by a collapsible menu: a `<details>` showing the
+current page, opening into the three groups (the week, the reasoning, the record) with
+full-width tap targets. No JS to open it; the only script is closing it on Escape or an
+outside tap. On the week view a "Today" button appears once today scrolls out of view,
+driven by an IntersectionObserver.
+
 ## The interface
 
 **A display serif carries the voice.** Headings and the masthead use a system serif

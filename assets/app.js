@@ -3,6 +3,12 @@
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+const NAV_GROUPS = [
+  { title: 'The week', files: ['index.html', 'cook.html', 'shopping.html', 'recipes.html'] },
+  { title: 'The reasoning', files: ['fuel.html', 'train.html', 'plan.html', 'eatout.html'] },
+  { title: 'The record', files: ['freezer.html', 'track.html'] },
+];
+
 const PAGES = [
   { file: 'index.html', label: 'This Week' },
   { file: 'cook.html', label: 'Cook Day' },
@@ -150,15 +156,74 @@ function windowPicker(mountSel) {
 
 /* ---------- chrome ---------- */
 
+/* ---------- cuisine art ----------
+   Each of these four cuisines has a tile tradition, so the motif comes from
+   that rather than from food illustration: bojagi patchwork for Korean,
+   Talavera for Mexican, a khatam eight-point star for Middle Eastern, and an
+   azulejo lattice for Spanish. The same motif twice: tiled faintly as a
+   ground, and once at size as the week's emblem. Geometry only, tone on
+   tone, inheriting currentColor so it follows the week's accent. */
+
+const ART = {
+  korean: {
+    tile: 72,
+    // bojagi: six pieces, deliberately uneven, tiling with full coverage
+    pattern: '<path d="M0 0h30v26H0zM30 0h42v16H30zM30 16h42v34H30zM0 26h18v46H0zM18 26h12v24H18zM18 50h54v22H18z" fill="none" stroke="currentColor" stroke-width="1.1"/>',
+    glyph: '<path d="M2 2h13v11H2zM15 2h15v7H15zM15 9h15v13H15zM2 13h8v17H2zM10 13h5v9H10zM10 22h20v8H10z" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+  },
+  mexican: {
+    tile: 48,
+    // Talavera: a four-petal flower on a square grid
+    pattern: '<g fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="24" cy="12" r="7"/><circle cx="24" cy="36" r="7"/><circle cx="12" cy="24" r="7"/><circle cx="36" cy="24" r="7"/><circle cx="24" cy="24" r="2.4"/><circle cx="0" cy="0" r="2"/><circle cx="48" cy="0" r="2"/><circle cx="0" cy="48" r="2"/><circle cx="48" cy="48" r="2"/></g>',
+    glyph: '<g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="16" cy="8" r="5.5"/><circle cx="16" cy="24" r="5.5"/><circle cx="8" cy="16" r="5.5"/><circle cx="24" cy="16" r="5.5"/><circle cx="16" cy="16" r="2"/></g>',
+  },
+  mideast: {
+    tile: 48,
+    // khatam: two squares, one rotated, making an eight-point star
+    pattern: '<g fill="none" stroke="currentColor" stroke-width="1.1"><rect x="12" y="12" width="24" height="24"/><rect x="12" y="12" width="24" height="24" transform="rotate(45 24 24)"/><circle cx="24" cy="24" r="3"/></g>',
+    glyph: '<g fill="none" stroke="currentColor" stroke-width="1.4"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/><circle cx="16" cy="16" r="2.2"/></g>',
+  },
+  spanish: {
+    tile: 44,
+    // azulejo: an interlaced diagonal lattice pinned at the crossings
+    pattern: '<g fill="none" stroke="currentColor" stroke-width="1.1"><path d="M-4 22 22-4 48 22 22 48z"/><path d="M6 22 22 6l16 16-16 16z"/><rect x="20" y="20" width="4" height="4"/></g>',
+    glyph: '<g fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 16 16 2l14 14-14 14z"/><path d="M8 16 16 8l8 8-8 8z"/></g>',
+  },
+};
+
+function cuisineSlug(name) {
+  const c = (name || '').toLowerCase();
+  return c.includes('korean') ? 'korean'
+    : c.includes('mexican') ? 'mexican'
+    : c.includes('middle') ? 'mideast'
+    : c.includes('spanish') ? 'spanish' : '';
+}
+
+/* the faint tiled ground, sized to whatever box it is dropped into */
+function cuisineGround(slug) {
+  const a = ART[slug];
+  if (!a) return '';
+  const id = 'p-' + slug;
+  return '<svg class="ground" aria-hidden="true" focusable="false">'
+    + '<defs><pattern id="' + id + '" width="' + a.tile + '" height="' + a.tile
+    + '" patternUnits="userSpaceOnUse">' + a.pattern + '</pattern></defs>'
+    + '<rect width="100%" height="100%" fill="url(#' + id + ')"/></svg>';
+}
+
+/* the same motif at size, as the week's emblem */
+function cuisineGlyph(slug, size) {
+  const a = ART[slug];
+  if (!a) return '';
+  const n = size || 30;
+  return '<svg class="glyph" width="' + n + '" height="' + n + '" viewBox="0 0 32 32"'
+    + ' aria-hidden="true" focusable="false">' + a.glyph + '</svg>';
+}
+
 /* the active week paints the accent, so the site changes character as the
    cuisine rotates. Chart series colours are not themed. */
 function applyCuisineTheme() {
   try {
-    const c = (weekData().cuisine || '').toLowerCase();
-    const slug = c.includes('korean') ? 'korean'
-      : c.includes('mexican') ? 'mexican'
-      : c.includes('middle') ? 'mideast'
-      : c.includes('spanish') ? 'spanish' : '';
+    const slug = cuisineSlug(weekData().cuisine);
     if (slug) document.body.dataset.cuisine = slug;
   } catch { /* pages without a week keep the default accent */ }
 }
@@ -171,6 +236,9 @@ function renderChrome(active) {
   else if (st.done) phase = 'Reset complete';
   else phase = 'Week ' + st.resetWeek + ' of ' + CONFIG.resetWeeks;
 
+  const byFile = Object.fromEntries(PAGES.map((p) => [p.file, p]));
+  const here = byFile[active] || PAGES[0];
+
   document.body.insertAdjacentHTML('afterbegin', `
     <header class="top">
       <div class="brand">
@@ -180,10 +248,29 @@ function renderChrome(active) {
         <span class="phase">${esc(phase)}</span>
       </div>
       <nav class="tabs">
-        ${PAGES.map((p, i) => (p.gap ? '<span class="sep"></span>' : '') +
+        ${PAGES.map((p) => (p.gap ? '<span class="sep"></span>' : '') +
           `<a href="${p.file}"${p.file === active ? ' aria-current="page"' : ''}>${esc(p.label)}</a>`).join('')}
       </nav>
+      <details class="menu">
+        <summary aria-label="Menu">
+          <span class="cur">${esc(here.label)}</span>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="menu-body">
+          ${NAV_GROUPS.map((g) => `<div class="menu-group">
+            <p class="eyebrow">${esc(g.title)}</p>
+            ${g.files.map((f) => `<a href="${f}"${f === active ? ' aria-current="page"' : ''}>${esc(byFile[f].label)}</a>`).join('')}
+          </div>`).join('')}
+        </div>
+      </details>
     </header>`);
+
+  /* close the menu on escape or on a tap outside it */
+  const menu = $('.menu');
+  if (menu) {
+    document.addEventListener('click', (e) => { if (!menu.contains(e.target)) menu.open = false; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') menu.open = false; });
+  }
 
   document.body.insertAdjacentHTML('beforeend', `
     <footer class="foot">
