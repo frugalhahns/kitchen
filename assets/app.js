@@ -5,7 +5,7 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': 
 
 const NAV_GROUPS = [
   { title: 'The week', files: ['index.html', 'cook.html', 'shopping.html', 'recipes.html'] },
-  { title: 'The reasoning', files: ['fuel.html', 'train.html', 'plan.html', 'eatout.html'] },
+  { title: "Charlie's plan", files: ['fuel.html', 'train.html', 'plan.html', 'eatout.html'] },
   { title: 'The record', files: ['freezer.html', 'track.html'] },
 ];
 
@@ -108,7 +108,7 @@ const PROTEIN = [
   ['Fish', /salmon|sardine|mackerel|\bcod\b|tuna|shrimp|gambas|\bfish\b|godeungeo/i],
   ['Poultry', /chicken|wings|shawarma|turkey/i],
   ['Pork', /carnitas|\bpork\b|jeyuk|belly|samgyeopsal/i],
-  ['Beef', /short rib|bulgogi|carne asada|ground beef|steak|burger|brisket|chuck|kofta|biltong|jerky|\bbeef\b|galbi/i],
+  ['Beef', /\brib\b|\bribs\b|bulgogi|carne asada|ground beef|steak|burger|brisket|chuck|kofta|biltong|jerky|\bbeef\b|galbi/i],
   ['Plant', /lentil|\bbean|edamame|chickpea|hummus|tofu|chili/i],
   ['Dairy', /yogurt|cottage cheese|whey|kefir/i],
   ['Eggs', /\begg|gyeranjjim/i],
@@ -125,6 +125,84 @@ function dinnerMix(week) {
     .sort((a, b) => b[1] - a[1])
     .map(([k, n]) => n + ' ' + k.toLowerCase())
     .join(' · ');
+}
+
+/* ---------- how tonight's dinner happens ----------
+   The one thing the week needs to say plainly. Green means the cooking is
+   already done, accent means there is a pan tonight, gold is the free meal.
+   Kept here rather than in each page so the wording never drifts. */
+
+const DINNER_SRC = {
+  sunday:   { cls: 'made',  label: 'Made Sunday',      cook: 'Made today' },
+  assemble: { cls: 'made',  label: 'No cooking',       cook: 'Assembles cold' },
+  freezer:  { cls: 'made',  label: 'From the freezer', cook: 'Thaw it today' },
+  fresh:    { cls: 'fresh', label: 'Cook tonight',     cook: 'Cook that night' },
+  free:     { cls: 'free',  label: 'Free meal',        cook: 'Free meal' },
+  cookday:  { cls: 'made',  label: 'Cook day',         cook: 'Out of the pot' },
+};
+
+/* Once the first cycle is behind you there are bags in the freezer, so the
+   nights marked `bank` stop being a quick cook and become a thaw. This is
+   the entire point of banking, and the plan should visibly get easier as it
+   happens rather than only saying that it will. */
+function bankIsStocked() {
+  const st = resetState();
+  return st.started && st.resetWeek > WEEKS.length;
+}
+
+function daySrc(d) { return d.bank && bankIsStocked() ? 'freezer' : d.src; }
+
+/* how the day card says it. `cook` is the same fact worded for the Sunday
+   page, where "made Sunday" would mean today. */
+function dinnerSrc(d, onCookDay) {
+  const key = daySrc(d);
+  const s = DINNER_SRC[key] || DINNER_SRC.fresh;
+  const mins = d.mins && (key === 'fresh' || key === 'assemble') ? ', ' + d.mins + ' min' : '';
+  return { cls: s.cls, label: (onCookDay ? s.cook : s.label) + mins };
+}
+
+/* how many of Monday to Friday need no cooking at all */
+function madeSunday(week) {
+  return week.days.slice(0, 5).filter((d) => daySrc(d) !== 'fresh' && daySrc(d) !== 'free').length;
+}
+
+/* what the pot is called this week. Usually the recipe's own name, but a week
+   can run a variant of it, and then the week wins. */
+function potName(week) {
+  return week.potName || RECIPES[week.pot].name.toLowerCase();
+}
+
+/* the weeknights grouped by how they happen */
+function nightsBy(week, kind) {
+  return week.days.slice(0, 5).filter((d) => daySrc(d) === kind).map((d) => d.day);
+}
+
+/* The whole week in one sentence, and the only sentence on the page that has
+   to be right: which nights the pot covers, which come out of the freezer,
+   and which want a pan. */
+function weekInOneLine(week, cookDay) {
+  const potDays = nightsBy(week, 'sunday').concat(nightsBy(week, 'assemble'));
+  const bankDays = nightsBy(week, 'freezer');
+  const panDays = nightsBy(week, 'fresh');
+  return [
+    'One pot on Sunday ' + fmtShort(cookDay) + ': ' + potName(week) + '.',
+    potDays.length ? 'It covers ' + listOf(potDays) + '.' : '',
+    bankDays.length ? listOf(bankDays) + (bankDays.length === 1 ? ' comes' : ' come') + ' out of the freezer.' : '',
+    panDays.length ? listOf(panDays) + (panDays.length === 1 ? ' needs' : ' need') + ' a pan.' : 'Nothing else needs a pan.',
+  ].filter(Boolean).join(' ');
+}
+
+/* Mon, Tue and Thu */
+function listOf(items) {
+  if (items.length <= 1) return items.join('');
+  if (items.length === 2) return items.join(' and ');
+  return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+}
+
+/* the weeknights that still want a pan, named, because that is the thing
+   worth knowing on a Monday morning */
+function panNights(week) {
+  return listOf(week.days.slice(0, 5).filter((d) => daySrc(d) === 'fresh').map((d) => d.day));
 }
 
 function proteinTag(text) {

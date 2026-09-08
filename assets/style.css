@@ -349,6 +349,9 @@ p { margin: var(--s-2) 0; }
   box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
 }
 .day.free { background: linear-gradient(180deg, var(--gold-soft) 0%, var(--card) 42%); }
+/* the cook day that feeds the week opens the grid, and looks like the one
+   card that is a job rather than a meal */
+.day.cookday { background: linear-gradient(180deg, var(--accent-soft) 0%, var(--card) 46%); }
 .day.past { opacity: .58; }
 
 .day .dh {
@@ -376,6 +379,102 @@ p { margin: var(--s-2) 0; }
 .pill.rest { background: var(--sunk); color: var(--ink-3); }
 .pill.today { background: var(--ink); color: var(--bg); }
 .pill.free { background: var(--gold-soft); color: var(--gold); }
+
+/* ---------- the dinner ----------
+   The card exists to answer one question, so the dinner gets the display
+   face, the size and a coloured rule, and everything else on the card is
+   quieter than it. Green rule: Sunday already cooked it. Accent: there is a
+   pan tonight. Gold: the free meal. */
+.dinner {
+  --dsrc: var(--ink-3);
+  border-left: 2px solid var(--dsrc);
+  padding: 0 0 0 var(--s-3);
+  margin: var(--s-3) 0;
+}
+.dinner.made  { --dsrc: var(--green); }
+.dinner.fresh { --dsrc: var(--accent); }
+.dinner.free  { --dsrc: var(--gold); }
+
+.dinner .dl {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-1);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--dsrc);
+}
+.dinner .dl .tm {
+  color: var(--ink-3);
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+.dinner .dl .spacer { flex: 1; }
+
+.dinner .dm {
+  font-family: var(--display);
+  font-size: var(--t-xl);
+  line-height: 1.25;
+  letter-spacing: -.012em;
+  margin: 0;
+}
+.dinner .dm a {
+  font-family: var(--sans);
+  font-size: var(--t-sm);
+  white-space: nowrap;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.dinner .dm a:hover { border-bottom-color: currentColor; }
+
+.dinner .dsrc {
+  margin: var(--s-2) 0 0;
+  min-height: 1.2em;
+  font-size: var(--t-sm);
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+/* the same badge is used on the day cards and on the cook-day page, so it
+   reads its colour from --dsrc: inherited from .dinner, or set on itself */
+.badge {
+  display: inline-block;
+  font-size: .66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: .14rem .4rem;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--dsrc, var(--ink-3)) 13%, transparent);
+  color: var(--dsrc, var(--ink-3));
+  vertical-align: .06em;
+  white-space: nowrap;
+}
+.badge.made  { --dsrc: var(--green); }
+.badge.fresh { --dsrc: var(--accent); }
+.badge.free  { --dsrc: var(--gold); }
+.dinner .badge { margin-right: .4rem; }
+
+.cooklist { padding-left: var(--s-3); margin: 0 0 var(--s-3); font-size: var(--t-sm); color: var(--ink-3); }
+
+/* the child's version of the same dinner, the other thing the cook needs */
+.day > .note-k {
+  margin: 0 0 var(--s-3);
+  padding-left: var(--s-3);
+  border-left: 2px solid color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+/* Charlie's own meals sit at the foot of every card, at the same height
+   across the row, behind one toggle */
+.day > details.extra {
+  margin-top: auto;
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--line);
+}
 
 /* a meal: time, a protein tag, the food. three columns, no boxes. */
 .meal {
@@ -436,6 +535,48 @@ details.extra > summary:hover { color: var(--accent); }
 .note-n { color: var(--ink-3); }
 .alsoline { font-size: var(--t-sm); color: var(--ink-3); }
 .alsoline a { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+
+/* ---------- foldable reference section ----------
+   Looks like an h2 and behaves like one, but the reading matter under it is
+   closed until asked for. Everything anyone needs weekly stays on the page;
+   everything they need once lives behind one of these. */
+details.ref { margin-top: var(--s-7); border-top: 1px solid var(--line); }
+details.ref > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  font-family: var(--display);
+  font-size: var(--t-xl);
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  font-weight: 600;
+  color: var(--ink);
+  padding: var(--s-4) 0 var(--s-3);
+}
+details.ref > summary::-webkit-details-marker { display: none; }
+details.ref > summary::before {
+  content: "";
+  align-self: flex-start;
+  width: 26px;
+  height: 2px;
+  flex: 0 0 26px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-top: calc(var(--s-4) + .55em);
+}
+details.ref > summary::after {
+  content: "+";
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: var(--t-lg);
+  color: var(--ink-3);
+  line-height: 1;
+}
+details.ref[open] > summary::after { content: "\2013"; }
+details.ref > summary:hover { color: var(--accent); }
+details.ref > summary:hover::after { color: var(--accent); }
 
 /* ---------- timeline (cook day) ---------- */
 
@@ -775,6 +916,12 @@ table.log td button:hover { color: var(--accent); }
   .card { border: none; padding: 0 0 .5rem; break-inside: avoid; }
   h2 { border-top: none; margin: 1rem 0 .3rem; }
   .grid.two { grid-template-columns: 1fr 1fr; }
+  /* the week is the other page worth printing: two up, dinners only, and
+     Charlie's meals left behind the toggle where they already are */
+  .grid.days { grid-template-columns: 1fr 1fr; }
+  .day { border: 1px solid #ccc; break-inside: avoid; }
+  .day > details.extra { display: none; }
+  .dinner .dm { font-size: 12pt; }
   ul.check input { -webkit-appearance: none; appearance: none; border: 1px solid #666; border-radius: 2px; }
 }
 
@@ -830,6 +977,7 @@ table.log td button:hover { color: var(--accent); }
   position: relative;
 }
 .mast .facts div { min-width: 0; }
+.mast .why { position: relative; margin-top: var(--s-3); }
 .mast .facts b {
   display: block;
   font-size: var(--t-ms);
