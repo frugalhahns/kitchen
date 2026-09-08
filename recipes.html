@@ -22,7 +22,7 @@ const CATS = [
 
 $('#main').innerHTML = `
   <h1>Recipes</h1>
-  <p class="lede">Every dish in the four-week rotation. Nothing here runs past eight ingredients or four steps, every one says how long it keeps in the fridge and the freezer, and each one lists what to change to keep it free of sugar and grain. The Every week group is the handful of things that carry all four cuisines.</p>
+  <p class="lede">Every dish in the rotation. None over eight ingredients or four steps.</p>
   <input class="rsearch" id="q" type="search" placeholder="Search by name, ingredient or cuisine" autocomplete="off">
   <div class="cats" id="cats">${CATS.map(([k, l], i) => `<button data-c="${k}" class="${i === 0 ? 'on' : ''}">${esc(l)}</button>`).join('')}</div>
   <div id="list"></div>

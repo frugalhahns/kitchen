@@ -20,31 +20,45 @@ const cookDay = addDays(mon, -1);
 
 $('#main').innerHTML = `
   <h1>Cook Day: Week ${w.n}</h1>
-  <p class="lede">Sunday ${esc(fmtShort(cookDay))}. About ${esc(w.cookTime)}, and most of that is waiting rather than working. One big thing goes in the pot, one tray goes in the oven, and the rest is portioning. The order matters more than the recipes do: the longest unattended item goes in first and the oven gets used twice.</p>
+  <p class="lede">Sunday ${esc(fmtShort(cookDay))}, ${esc(w.cookTime)}. You cook one thing: <a href="recipes.html#${esc(w.pot)}">${esc(potName(w))}</a>. Everything else on this list is the oven, the kettle or a zip bag.</p>
   <div id="wb"></div>
   <div class="tools">
     <a class="btn" href="shopping.html">Shopping list first</a>
     <button id="reset">Clear the checkmarks</button>
   </div>
   <div class="card"><ol class="tl" id="tl"></ol></div>
+
+  <h2>The dinners this buys</h2>
+  <div class="card"><div id="dinners"></div></div>
+
   <h2>What you should have at the end</h2>
   <div class="card">
     <h3>In the fridge, with a date on it</h3>
     <div id="keeps"></div>
     <h3 style="margin-top:1.2rem">In the freezer, banked</h3>
     <div id="bank"></div>
-    <p class="muted" style="margin-top:.7rem">Log the bags on the <a href="freezer.html">Storage page</a> while you are standing there. It takes a minute and it is the difference between a bank and a graveyard.</p>
+    <p class="muted" style="margin-top:.7rem">Log the bags on the <a href="freezer.html">Storage page</a> while you are standing there.</p>
   </div>
-  <h2>Rules that make the cook day work</h2>
-  <div class="card">
+  <details class="ref">
+    <summary>Six rules that make cook day work</summary>
+    <div class="card">
     <div class="qa"><b>Portion it before you put it away.</b><p>Bulk containers get eaten out of standing at the fridge. Individual portions get eaten as meals. This is the single highest-return habit of the whole day.</p></div>
     <div class="qa"><b>Decide what will not get eaten by Thursday, and freeze it now.</b><p>Four days is the honest fridge life of cooked meat. If Sunday makes eight servings and the week only has room for five, three go in the freezer today. Doing it on Thursday instead is how food gets thrown out.</p></div>
     <div class="qa"><b>Freeze flat, label with a marker.</b><p>Dish and date, written on the bag before it goes in. Flat bags stack like file folders and thaw in twenty minutes in a bowl of cold water. No vacuum sealer needed.</p></div>
     <div class="qa"><b>Let it cool before it goes in the freezer.</b><p>Warm food forms big ice crystals that wreck texture and it partly thaws whatever is next to it. Spread it on a sheet pan for fifteen minutes first, that is enough.</p></div>
     <div class="qa"><b>Save every rendered fat.</b><p>The fat off the chicken pan and the tallow skimmed off the braise are the best cooking fats you will have all week and they are free. A jar in the fridge door.</p></div>
     <div class="qa"><b>Clean as the timers run.</b><p>There are three or four twenty-minute unattended stretches in every one of these plans. Use them and you finish with an empty sink instead of a cook day followed by an argument about the kitchen.</p></div>
-  </div>
+    </div>
+  </details>
 `;
+
+$('#dinners').innerHTML = w.days.slice(0, 5).map((d, i) => {
+  const src = dinnerSrc(d, true);
+  return `<div class="frz">
+    <span class="n"><b>${esc(d.day)} ${esc(fmtShort(addDays(mon, i)))}</b> &middot; ${esc(d.m2)}</span>
+    <span class="age"><span class="badge ${src.cls}">${esc(src.label)}</span></span>
+  </div>`;
+}).join('');
 
 $('#keeps').innerHTML = (w.keeps || []).map(k => {
   const by = addDays(cookDay, k.days);

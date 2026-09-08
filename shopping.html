@@ -21,7 +21,7 @@ const shopDay = addDays(mon, -2);
 const sections = Object.keys(w.shop);
 $('#main').innerHTML = `
   <h1>Shopping: Week ${w.n}</h1>
-  <p class="lede">Saturday ${esc(fmtShort(shopDay))}. Farmers market first, then the meat counter and one grocery run. Under two hours, and the pantry list at the bottom is a one-time order rather than a weekly errand. Eat before you go.</p>
+  <p class="lede">Saturday ${esc(fmtShort(shopDay))}. Market, meat counter, one grocery run. Eat before you go.</p>
   <div id="wb"></div>
   <div class="tools">
     <button onclick="window.print()">Print or save as PDF</button>
@@ -33,27 +33,34 @@ $('#main').innerHTML = `
     <div class="flag reset"><b>This week at the market:</b> ${esc(w.market)}</div>
   </div>
 
-  <h2>Buy for the slot, not for the recipe</h2>
-  <p class="muted">${esc(MARKET.intro)}</p>
-  <div class="card">
-    ${MARKET.slots.map(s2 => `<div class="qa"><b>${esc(s2.slot)}</b><p>${esc(s2.means)}</p><p class="muted" style="margin-top:.25rem">${esc(s2.how)}</p></div>`).join('')}
-  </div>
+  <details class="ref">
+    <summary>Buy for the slot, not for the recipe</summary>
+    <p class="muted">${esc(MARKET.intro)}</p>
+    <div class="card">
+      ${MARKET.slots.map(s2 => `<div class="qa"><b>${esc(s2.slot)}</b><p>${esc(s2.means)}</p><p class="muted" style="margin-top:.25rem">${esc(s2.how)}</p></div>`).join('')}
+    </div>
+  </details>
 
-  <h2>What is actually there, month by month</h2>
-  <div class="card">
-    ${MARKET.months.map(m => `<div class="qa"><b>${esc(m.month)}</b><p>${esc(m.at)}</p></div>`).join('')}
-  </div>
+  <details class="ref">
+    <summary>What is actually at a market, month by month</summary>
+    <div class="card">
+      ${MARKET.months.map(m => `<div class="qa"><b>${esc(m.month)}</b><p>${esc(m.at)}</p></div>`).join('')}
+    </div>
+  </details>
 
-  <h2>Market rules</h2>
-  <div class="card">
-    <ul style="margin:0;padding-left:1.2rem">${MARKET.rules.map(r => `<li style="margin:.4rem 0">${esc(r)}</li>`).join('')}</ul>
-  </div>
+  <details class="ref">
+    <summary>Market rules</summary>
+    <div class="card">
+      <ul style="margin:0;padding-left:1.2rem">${MARKET.rules.map(r => `<li style="margin:.4rem 0">${esc(r)}</li>`).join('')}</ul>
+    </div>
+  </details>
 
-  <h2>The pantry: one order, then stop thinking about it</h2>
-  <p class="muted">None of this is a weekly shop and none of it needs a specialty trip. Order it once at the start of the reset and top up the two or three things that actually run out.</p>
-  <div class="card">
-    ${PANTRY.map(p => `<div class="qa"><b>${esc(p.item)}</b><p>${esc(p.why)}</p></div>`).join('')}
-  </div>
+  <details class="ref">
+    <summary>The pantry: one order, then stop thinking about it</summary>
+    <div class="card">
+      ${PANTRY.map(p => `<div class="qa"><b>${esc(p.item)}</b><p>${esc(p.why)}</p></div>`).join('')}
+    </div>
+  </details>
 `;
 weekBar('#wb');
 

@@ -12,8 +12,16 @@ A four-week menu cycle that repeats for a twelve-week reset. One cuisine per wee
 one shop and one set of condiments covers it: Korean, Mexican, Middle Eastern, then a
 light Spanish and American week that mostly comes out of the freezer.
 
-- **This Week** - the seven days, with today highlighted, lift days marked, the free
-  meal on Saturday, and what is in the fridge with the date it has to be eaten by
+**Sunday cooks exactly one thing.** One pot, big enough for three weeknight dinners
+plus four bags for the freezer: short ribs, then a pork shoulder, then a pot of lentil
+soup, then the big soup. Everything else on the cook day is a tray in the oven, a
+dozen eggs, a sauce in the blender, and raw meat going into dated bags. Fifty minutes,
+most of it the pot. The two nights the pot does not cover are a fifteen-minute pan in
+cycle 1 and, once the bank exists, a bag pulled from the freezer instead.
+
+- **This Week** - the dinner for every date, each one saying whether Sunday already
+  cooked it or whether it needs a pan tonight, opening with the cook day that feeds
+  the week, and ending in what is in the fridge and the date it has to be eaten by
 - **Cook Day** - the Sunday playbook as a timed checklist, 45 to 85 minutes depending
   on the week, ending in what should be in the fridge and what should be banked
 - **Shopping** - farmers market by slot rather than by named vegetable, plus what is
@@ -178,17 +186,40 @@ visible everywhere and removed nowhere.
 One type scale, one spacing scale, and hairlines doing the separating instead of a
 shadow on every card. The specifics worth knowing:
 
-- **A day is three meals and nothing else.** Everything that used to stack under them
-  (post-lift note, kid line, day note, related recipes) collapses behind one quiet
-  `n notes` toggle, open by default only on today. Cards went from seven stacked blocks
-  to three lines.
+- **A day is one dinner.** The card carries the dinner, a badge, and the line for the
+  8-year-old. That is all. Charlie's 10am and 2pm, the post-lift note and the day note
+  are behind one closed toggle at the foot of the card, because they are his and not
+  the household's. Nothing on the card explains itself in a sentence where a badge
+  does the job.
+- **Every dinner says how it happens, in two words.** `src` on each day is `sunday`,
+  `assemble`, `fresh`, `free` or `cookday`, and `mins` is the work that night. It
+  renders as a badge and nothing else: `MADE SUNDAY`, `COOK TONIGHT, 15 MIN`, `NO
+  COOKING, 10 MIN`. Green for cooking already done, the week's accent for a pan
+  tonight, gold for the free meal. The masthead line and the list on the Cook Day page
+  derive from the same field, so they cannot disagree with the cards.
+- **Reading matter folds away.** Anything needed once rather than weekly sits behind a
+  `details.ref`, which looks exactly like an `h2` and opens on a tap: the market slots,
+  the month-by-month produce, the market rules, the pantry order, the six cook-day
+  rules, and the paragraph about why the week is shaped the way it is. The Shopping
+  page went from five sections of prose to a checklist and four closed folds. The four
+  pages under Charlie's plan are deliberately still essays; that is what they are for.
+- **The plan visibly gets easier.** Nights marked `bank` in the data are a quick cook
+  while the freezer is empty and render as `FROM THE FREEZER` from cycle 2 onward, off
+  `resetState()`. Week 1 Friday says "cook tonight, 5 min" in October and "from the
+  freezer" in November without anyone editing anything. That progression was the point
+  of banking and it used to be something the site only asserted in prose.
+- **The grid opens with the cook day.** Two Sundays are in play in any week: the one
+  before Monday that makes the food, and the one at the end that starts the next week.
+  The first is a card of its own at the head of the grid; the second says which week it
+  is cooking for and links to that plan.
 - **Protein tags** (`FISH`, `BEEF`, `PLANT`) are derived from the meal text at render
   time by `proteinTag()`, never stored, so a tag cannot drift out of sync with the food.
   They make the week's variety scannable, and they immediately exposed a logic bug:
   Wednesday lunch was "cold salmon" on a day the salmon is not cooked until dinner.
 - **Three-column week** on wide screens, two on tablet, one on phone. Today gets an
   accent ring; past days recede; the free meal Saturday gets a gold wash.
-- **Nav is grouped** into the week, the reasoning, and the record. Long pages get a
+- **Nav is grouped** into the week, Charlie's plan, and the record, so anyone else
+  cooking from this can see at a glance which four pages are theirs. Long pages get a
   jump nav so they stop being a wall.
 - **Charts follow the dataviz spec:** two single-series small multiples rather than a
   dual axis, 2px lines, r=4 markers with a 2px surface ring, a solid hairline target
@@ -214,7 +245,10 @@ Common edits:
 | Move the start date | `CONFIG.cycleStart` (must be a Monday) |
 | Change reset length | `CONFIG.resetWeeks` |
 | Fix the birthday | `CONFIG.birthday` |
-| Swap a dinner | the `days` array inside the week in `WEEKS` |
+| Change the one pot | `pot` on the week (a `RECIPES` id), plus `potName` if the week runs a variant |
+| Swap a dinner | the `days` array inside the week in `WEEKS`, and set `src` / `mins` to match |
+| Make a night flip to the freezer later | `bank: true` on that day |
+| Change how a dinner happens | `src` on the day: `sunday`, `assemble`, `freezer`, `fresh`, `free`, `cookday` |
 | Add a recipe | a new key in `RECIPES`, then reference its id as `m2r` or in `also` on a day |
 | Change a shelf life | `keep: { fridge, freezer }` on the recipe, or the `KEEPS.table` row |
 | Change what is in the fridge and by when | the `keeps` array on the week |
