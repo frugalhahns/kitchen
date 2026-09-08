@@ -18,20 +18,11 @@ const CONFIG = {
   resetWeeks: 12,
   // Set your real date. The week containing it gets a note.
   birthday: '2026-10-15',
-  // Eating windows (16:8 either way). Pick one on the week view, it sticks.
-  // Three eating occasions inside whichever you choose. See the Fuel page for why.
-  windows: [
-    {
-      id: 'noon', label: 'Noon to 8pm',
-      first: '12:00 pm', snack: '3:30 pm', dinner: '7:00 pm', end: '8:00 pm',
-      why: 'The default. Right if you lift in the afternoon or evening and eat dinner with the family at seven.',
-    },
-    {
-      id: 'early', label: '10am to 6pm',
-      first: '10:00 am', snack: '2:00 pm', dinner: '5:30 pm', end: '6:00 pm',
-      why: 'Shift here if you lift in the morning, or if you want the last meal well clear of bedtime. Eating earlier in the day tends to sit better with fasting glucose, and it is the same 16:8 either way. The first meal becomes eggs and vegetables rather than a full plate.',
-    },
-  ],
+  // The eating window. 16:8, three occasions inside it. See the Fuel page.
+  window: {
+    first: '10:00 am', snack: '2:00 pm', dinner: '5:30 pm', end: '6:00 pm',
+    label: '10am to 6pm',
+  },
   // Protein target, grams/day. Roughly 1g per lb of goal bodyweight.
   proteinTarget: 170,
   // Fiber target, grams/day. The number this plan was missing entirely.
@@ -1309,8 +1300,8 @@ const PROTOCOL = {
     { rule: 'Fish twice a week, chicken twice, red meat twice.', detail: 'Every week in the cycle is built to that shape, with sardines at lunch as the second fish. The reason is your cholesterol history: saturated fat is the main dietary lever on ApoB and the fattiest cuts here, short ribs and pork shoulder and wings, are anchors rather than staples. Oily fish is the one thing on this plan that nothing else replaces. See the protein section on this page for what to do with the week 12 numbers.' },
     { rule: 'Fiber, 30 to 40g a day. Lentils and beans are how you get there.', detail: 'This plan originally had no fiber target at all, which was a real hole given both of your numbers. Vegetables alone get you to about 17g. A cup of lentils or black beans adds 15 and closes it in one move. Viscous fiber lowers LDL directly and blunts the glucose rise from anything eaten with it, so it happens to be the one addition that works on your cholesterol and your blood sugar at the same time. Legumes are not grains and were never excluded from this protocol.' },
     { rule: 'Ten pounds of vegetables a week, from the market.', detail: 'It sounds like a lot and it is roughly right for two adults. Buy for the slot rather than the recipe: roasting vegetables, sturdy greens, something raw and crunchy, herbs, alliums. Then roast a sheet pan of whatever it was.' },
-    { rule: 'Three eating occasions inside the window, not two.', detail: 'Noon, around 3:30pm, and dinner. Two meals a day quietly delivers about 120g of protein against a 170g target and a deficit big enough to cost you muscle, which is a fat-loss plan rather than the recomposition you actually want. The afternoon one is a protein meal, not a snack: cottage cheese, yogurt, or four ounces of whatever is already cooked. The Fuel page has the arithmetic and your numbers.' },
-    { rule: 'Pick an eight hour window and hold it loosely.', detail: 'Noon to 8pm or 10am to 6pm, whichever fits the week. Switch it on the week view and every page follows. Black coffee, tea and water outside it. The window is a tool for eating less without counting, not a rule with moral weight, and the earlier one tends to sit slightly better with fasting glucose if dinner at 5:30 works with your family. What matters is that the three occasions land inside whichever you pick, rather than a fourth appearing outside it.' },
+    { rule: 'Three eating occasions inside the window, not two.', detail: '10am, around 2pm, and dinner at 5:30. Two meals a day quietly delivers about 120g of protein against a 170g target and a deficit big enough to cost you muscle, which is a fat-loss plan rather than the recomposition you actually want. The afternoon one is a protein meal, not a snack: cottage cheese, yogurt, or four ounces of whatever is already cooked. The Fuel page has the arithmetic and your numbers.' },
+    { rule: 'Eat between 10am and 6pm, and hold it loosely.', detail: 'Black coffee, tea and water outside it, nothing with calories. Eating earlier in the day and finishing well clear of bedtime is the version that sits best with fasting glucose, and a 5:30 dinner means you eat with your son rather than after him. The window is a tool for eating less without counting, not a rule with moral weight. What matters is that the three occasions land inside it rather than a fourth appearing outside it.' },
     { rule: 'Fats from animals, olives and avocados.', detail: 'Butter, ghee, tallow, the fat off the chicken pan, olive oil, avocado oil, sesame oil. Save every rendered fat, it is the best thing you will cook with all week and it is free.' },
     { rule: 'Alcohol goes with the free meal, if at all.', detail: 'It stalls fat loss out of proportion to its calories and it reliably wrecks the decisions that keep the rest of this intact. Attaching it to the one free meal means you never have to decide about it on a Tuesday.' },
     { rule: 'Walk ten to fifteen minutes after dinner. Every night.', detail: 'This is the highest-return habit on the whole site and it is not exercise, it is glucose management. Walking right after a meal pulls glucose into muscle without insulin. With a prediabetes history it does more per minute than anything else here. Take your son.' },
@@ -1459,7 +1450,7 @@ const FUEL = {
   },
   day: {
     title: 'How the day should actually add up',
-    body: 'Three eating occasions inside whichever eight hour window you picked. The times below follow it. The afternoon one is the meal that was missing, and on lift days it lands close to training.',
+    body: 'Three eating occasions between 10am and 6pm. The afternoon one is the meal that was missing, and on lift days it lands either side of the session.',
     rows: [
       { slot: 'first', what: 'First meal: a bowl of soup, or the sardine plate with half an avocado', protein: '55 to 65g', kcal: '700 to 800', fiber: '12 to 15g' },
       { slot: 'snack', what: 'The protein meal. Cottage cheese or yogurt, with a spoon of chia in it.', protein: '25 to 35g', kcal: '200 to 300', fiber: '5g' },
@@ -1550,7 +1541,7 @@ const FUEL = {
       { p: 'But go up slowly or it gets worse before it gets better.', d: 'Doubling fiber inside a week means gas, bloating and looser stool for a stretch, and most people quit there and blame the beans. Add one cup of legumes a day, hold it for a week, then adjust. Drink more water than feels necessary while you do.' },
       { p: 'Very high fat can do this on its own.', d: 'The first version of this plan was extremely fat-heavy: fatty cuts, tallow, oil on everything. Fat arriving faster than your bile can handle it makes for looser stool. The rebalance toward fish, chicken, legumes and olive oil pulls in the right direction here too, which is a second reason for it.' },
       { p: 'Allulose is a known offender, and it is optional here.', d: 'It behaves like a sugar alcohol in the gut and at more than a spoonful it causes gas and loose stool in a lot of people. It is listed as optional in the pantry for exactly this reason. If you use it and this is your baseline, drop it for two weeks and see what happens.' },
-      { p: 'Black coffee for four hours on an empty stomach.', d: 'A noon first meal means a long morning of coffee on nothing, and coffee stimulates the colon directly whether or not it has caffeine in it. Cheap thing to test: move it later, or eat first, for a week.' },
+      { p: 'Black coffee on an empty stomach.', d: 'Coffee stimulates the colon directly whether or not it has caffeine in it, and on this window you are drinking it for a couple of hours before the first meal. Cheap thing to test: have it with the 10am meal rather than before it, for a week.' },
       { p: 'Mention it at the lab appointment.', d: 'You are already getting blood drawn. A long-standing change in stool consistency is a thirty second thing to raise while you are there, and there are several ordinary explanations worth ruling out properly rather than guessing at from a meal-plan website. Not urgent. Just do not let it be the thing you never get round to saying.' },
     ],
     test: 'The clean test for the dairy question: cut all dairy for two weeks, then reintroduce Greek yogurt on its own and see what happens. Two weeks is long enough to be sure and short enough that you will actually do it. Change one thing at a time or you will learn nothing.',
@@ -1579,7 +1570,7 @@ const FUEL = {
   ],
   nots: [
     { p: 'Nuts are not a protein snack.', d: 'An ounce of almonds is 165 calories and 6g of protein. That is the worst ratio in your pantry and it is extremely easy to eat three ounces without noticing. Nuts are a fat you add on purpose, not a snack you reach for, and they are already on the stall list on the Plan page for exactly this reason.' },
-    { p: 'Do not add breakfast.', d: 'A yogurt at 7am moves your first meal four hours earlier and turns 16:8 into 13:11. The window is not magic, but the overnight fasting hours are one of the levers on your fasting glucose, and you get the same protein by moving that yogurt to 3:30pm at no cost. The exception is already in the plan: if you lift in the morning, shift the whole window earlier rather than eating outside it.' },
+    { p: 'Do not eat before 10 or after 6.', d: 'The 10am meal is your breakfast, so nothing needs adding in front of it. A yogurt at 7am turns 16:8 into 13:11, and a snack at 9pm does the same thing from the other end. The window is not magic, but the overnight fasting hours are one of the levers on your fasting glucose and they are free. Black coffee, tea and water are fine at either end.' },
     { p: 'Do not eat between the three meals.', d: 'Three defined occasions is a structure. Three occasions plus grazing is just eating all day, and it is the most common way a plan like this quietly stops producing a deficit. Cheese and nuts at 5pm are the usual culprits.' },
     { p: 'Do not chase the deficit lower when progress stalls.', d: 'The instinct is to cut more. At a 500 calorie deficit with 170g of protein and four lifts a week, a stall is almost never too many calories in the food you planned. It is the food you did not plan, or the free meal expanding, or sleep, or water weight sitting on top of real fat loss. Cutting to 1,200 calories will cost you the muscle you are training for.' },
   ],
@@ -1654,7 +1645,7 @@ const EATOUT = {
 const TRAINING = {
   intro: 'Four days on the Tonal, Monday Tuesday Thursday Friday, following Go Big or Go Home. The Tonal decides what you lift and how much. This page is only about the parts it does not handle: when to eat around it, and the walking that does more for your blood sugar than any of the lifting does.',
   week: [
-    { day: 'Mon', what: 'Tonal, Go Big or Go Home', food: 'Train after noon if you can. If you train before the window opens, that is fine, but eat 50g of protein within 90 minutes of finishing. Monday dinner in every week of this cycle is the highest-protein one for exactly this reason.' },
+    { day: 'Mon', what: 'Tonal, Go Big or Go Home', food: 'Train after the 10am meal if you can, and the 2pm meal covers the 50g of protein you want within 90 minutes of finishing. Monday dinner in every week of this cycle is the highest-protein one for the same reason.' },
     { day: 'Tue', what: 'Tonal, Go Big or Go Home', food: 'Same. Back-to-back lift days are the ones where underfeeding protein catches up with you.' },
     { day: 'Wed', what: 'Rest from lifting. Walk 30 to 40 min.', food: 'Wednesday is the zero-cook night in every week. Something out of the fridge or a bag out of the freezer.' },
     { day: 'Thu', what: 'Tonal, Go Big or Go Home', food: 'Steak night tends to fall here, which is not an accident.' },
@@ -1669,5 +1660,5 @@ const TRAINING = {
     { thing: 'Sleep 7 hours or the rest of this works less well', why: 'Short sleep raises insulin resistance and appetite measurably within days. It is not a moral issue, it is the same lever as the food.' },
     { thing: 'Measure your waist weekly, same time, same place', why: 'The scale moves for a dozen reasons that are not fat. Your waist at the navel, first thing Saturday morning, is the number that answers the belly-fat question. Log it on the Progress page.' },
   ],
-  ifNote: 'If you lift in the morning and hate waiting until noon to eat, shift the window earlier rather than pushing through. 10am to 6pm works, with the three eating occasions sliding along with it. The fasting length matters far less than the protein total and the food quality, and training four days a week while eating nothing until noon is a good way to quit in week three.',
+  ifNote: 'The window is 10am to 6pm, which suits a morning lift: eat at 10, train, and the 2pm meal lands as the post-session one. If you train in the evening instead, dinner at 5:30 is your pre-lift meal and you may want the afternoon one a little later. The fasting length matters far less than the protein total and the food quality, so move the times around inside the window rather than pushing through hungry.',
 };

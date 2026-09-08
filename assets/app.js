@@ -135,24 +135,7 @@ function proteinTag(text) {
 
 /* ---------- eating window ---------- */
 
-function activeWindow() {
-  const id = store.get('eatwindow', CONFIG.windows[0].id);
-  return CONFIG.windows.find((w) => w.id === id) || CONFIG.windows[0];
-}
-
-function windowPicker(mountSel) {
-  const mount = $(mountSel);
-  if (!mount) return;
-  const cur = activeWindow();
-  mount.className = 'weekbar';
-  mount.innerHTML =
-    '<span class="now" style="margin:0 .3rem 0 0">Eating window</span>' +
-    CONFIG.windows.map((w) => `<button data-win="${w.id}" class="${w.id === cur.id ? 'on' : ''}">${esc(w.label)}</button>`).join('') +
-    `<span class="now">${esc(cur.first)}, ${esc(cur.snack)}, ${esc(cur.dinner)}</span>`;
-  mount.querySelectorAll('button').forEach((b) => {
-    b.onclick = () => { store.set('eatwindow', b.dataset.win); location.reload(); };
-  });
-}
+function activeWindow() { return CONFIG.window; }
 
 /* ---------- chrome ---------- */
 

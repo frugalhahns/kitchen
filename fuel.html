@@ -108,7 +108,6 @@ $('#main').innerHTML = `
 
   <h2 id="day">${esc(FUEL.day.title)}</h2>
   <p class="muted">${esc(FUEL.day.body)}</p>
-  <div id="win"></div>
   <div class="card">
     <table class="log">
       <thead><tr><th>When</th><th>Protein</th><th>Fiber</th><th>Calories</th><th>What</th></tr></thead>
@@ -145,8 +144,6 @@ $('#main').innerHTML = `
     ${FUEL.adjust.map(a => `<div class="qa"><b>${esc(a.signal)}</b><p>${esc(a.do)}</p></div>`).join('')}
   </div>
 `;
-
-windowPicker('#win');
 
 $('#wsnacks').innerHTML = w.days.map(d => `<div class="frz">
   <span class="n">${esc(d.snack || w.snack || '')}</span>

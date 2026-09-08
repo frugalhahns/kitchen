@@ -50,7 +50,6 @@ $('#main').innerHTML = `
     ${st.started && !st.done ? `<div class="bar" style="margin-top:var(--s-3)"><i style="width:${pct}%"></i></div>` : ''}
   </header>
   <div id="wb"></div>
-  <div id="win"></div>
   ${banner}
   <div class="tools">
     <a class="btn" href="cook.html">Sunday cook plan (${esc(w.cookTime)})</a>
@@ -73,8 +72,6 @@ $('#main').innerHTML = `
 `;
 
 weekBar('#wb');
-windowPicker('#win');
-
 $('#keeps').innerHTML = (w.keeps || []).map(k => {
   const by = addDays(cookDay, k.days);
   const gone = iso(by) < todayISO;
