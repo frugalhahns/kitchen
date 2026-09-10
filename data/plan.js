@@ -17,7 +17,7 @@ const CONFIG = {
   // Length of the reset in weeks. The 4-week cycle repeats inside it.
   resetWeeks: 12,
   // Set your real date. The week containing it gets a note.
-  birthday: '2026-10-15',
+  birthday: '2026-10-14',
   // The eating window. 16:8, three occasions inside it. See the Fuel page.
   window: {
     first: '10:00 am', snack: '2:00 pm', dinner: '5:30 pm', end: '6:00 pm',
